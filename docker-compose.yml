@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    volumes:
+      - ./backend:/app  # Live sync for development
+    ports:
+      - "8000:8000"
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    # This assumes your main FastAPI entry point is at backend/main.py
+
+  frontend:
+    build:
+      context: ./frontend/sales-assistant
+      dockerfile: Dockerfile
+    container_name: frontend
+    volumes:
+      - ./frontend/sales-assistant:/app # Live sync for development
+      - /app/node_modules  
+    ports:
+      - "3000:3000"
+    command: npm run dev
