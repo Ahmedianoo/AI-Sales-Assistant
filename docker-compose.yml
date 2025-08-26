@@ -11,7 +11,8 @@ services:
     ports:
       - "8000:8000"
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-    # This assumes your main FastAPI entry point is at backend/main.py
+    depends_on:
+      - db   # wait for Postgres before starting
 
   frontend:
     build:
@@ -24,3 +25,19 @@ services:
     ports:
       - "3000:3000"
     command: npm run dev
+
+  db:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
