@@ -1,4 +1,5 @@
-version: '3.8'
+#version is obsolete warning; better to remove it
+#version: '3.8'
 
 services:
   backend:
