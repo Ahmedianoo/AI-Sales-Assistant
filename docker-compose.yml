@@ -14,6 +14,8 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - db   # wait for Postgres before starting
+    env_file:
+      - .env
 
   frontend:
     build:
