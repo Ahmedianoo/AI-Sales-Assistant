@@ -45,7 +45,6 @@ DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 
 if all([DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME]):
     SQLALCHEMY_DATABASE_URL = f"postgresql://{encoded_user}:{encoded_password}@{DB_HOST}:{DB_PORT}/{encoded_name}"
-    config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URL)
 else:
     print("Warning: Database credentials not found in environment variables. Using default alembic.ini values.")
 
@@ -86,10 +85,10 @@ def run_migrations_online() -> None:
     configuration["sqlalchemy.url"] = config.get_main_option("sqlalchemy.url")
 
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        { "sqlalchemy.url": SQLALCHEMY_DATABASE_URL },
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-    )
+        )
 
     with connectable.connect() as connection:
         context.configure(
