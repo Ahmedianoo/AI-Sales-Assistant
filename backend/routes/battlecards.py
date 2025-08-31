@@ -19,7 +19,7 @@ router = APIRouter(
 class BattlecardBase(BaseModel):
     user_comp_id: int
     title: str
-    content: dict
+    content: Optional[dict] = None
     auto_release: Optional[bool] = False
 
 

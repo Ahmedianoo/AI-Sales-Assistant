@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import battlecards
+from routes import battlecards
 
 
 app = FastAPI()
