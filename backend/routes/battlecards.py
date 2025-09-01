@@ -39,7 +39,7 @@ class BattlecardUpdate(BaseModel):
 #-----Read/Response------
 class BattlecardOut(BattlecardBase):
     battlecard_id: int
-    created_at: datetime.datetime
+    created_at: Optional[datetime.datetime] = None
 
     class Config:
         orm_mode = True
@@ -65,7 +65,7 @@ class UserCompetitorOut(UserCompetitorBase):
     user_comp_id: int
     user_id: int
     competitor: CompetitorOut   
-    created_at: datetime.datetime
+    created_at: Optional[datetime.datetime] = None
 
     class Config:
         orm_mode = True        
