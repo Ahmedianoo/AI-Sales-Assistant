@@ -5,3 +5,7 @@ python-dotenv
 sqlalchemy
 alembic
 psycopg2-binary
+passlib[bcrypt]
+passlib
+jwt
+python-jose[cryptography]
