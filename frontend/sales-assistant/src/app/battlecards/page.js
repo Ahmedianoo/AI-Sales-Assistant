@@ -1,20 +1,26 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import GenerateBattlecardForm from "./components/GenerateBattlecardForm";
-import { fetchBattlecards } from "../actions/battlecards";
+import FilterSelect from "./components/FilterSelect";
+import {  deleteBattlecard  } from "../actions/battlecards";
+import BattlecardList from "./components/BattlecardList";
+import BattlecardModal from "./components/BattlecardModal";
 
 export default function BattlecardsPage() {
   const [battlecards, setBattlecards] = useState([]);
-  const[open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const temp = 888;
 
-  useEffect(() => {
-    async function load() {
-      const data = await fetchBattlecards(2);
-      setBattlecards(data);
-    }
-    load();
-  }, []);
+  const updateBattlecard = (updated) => {
+    setBattlecards((prev) =>
+      prev.map((c) =>
+        c.battlecard_id === updated.battlecard_id ? updated : c
+      )
+    );
+  };
+  
 
   const addBattlecard = (newCard) => {
     setBattlecards((prev) => [...prev, newCard]);
@@ -50,12 +56,6 @@ export default function BattlecardsPage() {
               Generate Battlecard
            </button>   
           </div>
-
-
-
-       
-          
-
         </div>
       </div>
 
@@ -64,24 +64,38 @@ export default function BattlecardsPage() {
         <GenerateBattlecardForm userId={temp} onCreated={addBattlecard} open={open} setOpen={setOpen}/>
       </div>
 
+      <div className="mt-6 flex justify-center">
+        <FilterSelect userId={temp} onSelect={setBattlecards} />
+      </div>
+      
+
       {/* Battlecards List */}
-      {/* <div className="mt-8 grid gap-4">
-        {battlecards.map((card) => (
-          <div
-            key={card.battlecard_id}
-            className="p-4 rounded-xl shadow bg-white"
-          >
-            <h3 className="text-lg font-bold">{card.title}</h3>
-            <p>
-              Competitor:{" "}
-              {card.competitor ? card.competitor.name : `#${card.user_comp_id}`}
-            </p>
-            <p className="text-sm text-gray-500">
-              Auto-release: {card.auto_release ? "Yes" : "No"}
-            </p>
-          </div>
-        ))}
-      </div> */}
+      <div className="mt-8">
+        <BattlecardList
+          battlecards={battlecards}
+          onView={(card) => { setSelectedCard(card); setModalOpen(true); }}
+          onEdit={(card) => { setSelectedCard(card); setModalOpen(true); }}
+          onDelete={async (card) => {
+            if (!confirm("Are you sure you want to delete this battlecard?")) return;
+            const success = await deleteBattlecard(card.battlecard_id);
+            if (success) {
+              setBattlecards((prev) => prev.filter(c => c.battlecard_id !== card.battlecard_id));
+            }
+          }}
+        />
+      </div>
+
+      {/* Battlecard Detail Modal */}
+      <BattlecardModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        battlecard={selectedCard}
+        onUpdate={updateBattlecard}
+      />
+
+
+
+      
     </div>
   );
 }
