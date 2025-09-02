@@ -39,7 +39,8 @@ class BattlecardUpdate(BaseModel):
 #-----Read/Response------
 class BattlecardOut(BattlecardBase):
     battlecard_id: int
-    created_at: datetime.datetime
+    created_at: Optional[datetime.datetime] = None
+    competitor_name: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -65,64 +66,130 @@ class UserCompetitorOut(UserCompetitorBase):
     user_comp_id: int
     user_id: int
     competitor: CompetitorOut   
-    created_at: datetime.datetime
+    created_at: Optional[datetime.datetime] = None
 
     class Config:
         orm_mode = True        
 
 
 
-@router.get("/", response_model = List[BattlecardOut])
-def get_battlecards(db: Session = Depends(get_db)):
-    return db.query(Battlecard).all()  
+@router.get("/{user_id}", response_model=List[BattlecardOut])
+def get_battlecards(user_id: int, db: Session = Depends(get_db)):
+    battlecards = (
+        db.query(Battlecard)
+        .join(UserCompetitor, Battlecard.user_comp_id == UserCompetitor.user_comp_id)
+        .filter(UserCompetitor.user_id == user_id)
+        .all()
+    )
+
+    if not battlecards:
+        raise HTTPException(status_code=404, detail="No battlecards found for this user")
+
+    return [
+        BattlecardOut(
+            battlecard_id=bc.battlecard_id,
+            user_comp_id=bc.user_comp_id,
+            title=bc.title,
+            content=bc.content,
+            auto_release=bc.auto_release,
+            created_at=bc.created_at,
+            competitor_name=bc.user_competitor.competitor.name,  
+        
+        )
+        for bc in battlecards
+    ]
 
 
-@router.post("/", response_model = BattlecardOut)
+
+
+@router.post("/", response_model=BattlecardOut)
 def create_battlecard(battlecard: BattlecardCreate, db: Session = Depends(get_db)):
     new_battlecard = Battlecard(
-        user_comp_id = battlecard.user_comp_id, 
-        title = battlecard.title, 
-        content = battlecard.content, 
-        auto_release = battlecard.auto_release
+        user_comp_id=battlecard.user_comp_id, 
+        title=battlecard.title, 
+        content=battlecard.content, 
+        auto_release=battlecard.auto_release
     )
     db.add(new_battlecard)
     db.commit()
     db.refresh(new_battlecard)
-    return new_battlecard
+
+    return BattlecardOut(
+        battlecard_id=new_battlecard.battlecard_id,
+        user_comp_id=new_battlecard.user_comp_id,
+        title=new_battlecard.title,
+        content=new_battlecard.content,
+        auto_release=new_battlecard.auto_release,
+        created_at=new_battlecard.created_at,
+        competitor_name=new_battlecard.user_competitor.competitor.name
+    )
 
 
-@router.get("/{id}", response_model = BattlecardOut)
+
+@router.get("/{id}", response_model=BattlecardOut)
 def get_a_battlecard(id: int, db: Session = Depends(get_db)):
     battlecard = db.query(Battlecard).filter(Battlecard.battlecard_id == id).first()
     if not battlecard:
         raise HTTPException(status_code=404, detail="Battlecard not found")
-    return battlecard
+    
+    return BattlecardOut(
+        battlecard_id=battlecard.battlecard_id,
+        user_comp_id=battlecard.user_comp_id,
+        title=battlecard.title,
+        content=battlecard.content,
+        auto_release=battlecard.auto_release,
+        created_at=battlecard.created_at,
+        competitor_name=battlecard.user_competitor.competitor.name
+    )
 
 
-@router.put("/{id}", response_model = BattlecardOut)
+
+@router.put("/{id}", response_model=BattlecardOut)
 def update_battlecard(id: int, battlecard_update: BattlecardUpdate, db: Session = Depends(get_db)):
     battlecard = db.query(Battlecard).filter(Battlecard.battlecard_id == id).first()
     if not battlecard:
         raise HTTPException(status_code=404, detail="Battlecard not found")
     
-    updated_data = battlecard_update.dict(exclude_unset = True)
-
-    for key ,value in updated_data.items():
+    updated_data = battlecard_update.dict(exclude_unset=True)
+    for key, value in updated_data.items():
         setattr(battlecard, key, value)
 
     db.commit()
     db.refresh(battlecard)
-    return battlecard
+
+    # Explicitly construct BattlecardOut with competitor name
+    return BattlecardOut(
+        battlecard_id=battlecard.battlecard_id,
+        user_comp_id=battlecard.user_comp_id,
+        title=battlecard.title,
+        content=battlecard.content,
+        auto_release=battlecard.auto_release,
+        created_at=battlecard.created_at,
+        competitor_name=battlecard.user_competitor.competitor.name
+    )
+
 
 @router.delete("/{id}", response_model=BattlecardOut)  
 def delete_battlecard(id: int, db: Session = Depends(get_db)):
     battlecard = db.query(Battlecard).filter(Battlecard.battlecard_id == id).first()
     if not battlecard:
         raise HTTPException(status_code=404, detail="Battlecard not found")
+    
+    response = BattlecardOut(
+        battlecard_id=battlecard.battlecard_id,
+        user_comp_id=battlecard.user_comp_id,
+        title=battlecard.title,
+        content=battlecard.content,
+        auto_release=battlecard.auto_release,
+        created_at=battlecard.created_at,
+        competitor_name=battlecard.user_competitor.competitor.name
+    )
+
     db.delete(battlecard)
     db.commit()
 
-    return battlecard
+    return response
+
 
     
     
@@ -141,7 +208,20 @@ def get_battlecards_for_competitor(user_comp_id: int, db: Session = Depends(get_
     battlecards = db.query(Battlecard).filter(Battlecard.user_comp_id == user_comp_id).all()
     if not battlecards:
         raise HTTPException(status_code=404, detail="No battlecards found for this competitor")
-    return battlecards
+
+    return [
+        BattlecardOut(
+            battlecard_id=bc.battlecard_id,
+            user_comp_id=bc.user_comp_id,
+            title=bc.title,
+            content=bc.content,
+            auto_release=bc.auto_release,
+            created_at=bc.created_at,
+            competitor_name=bc.user_competitor.competitor.name,
+        )
+        for bc in battlecards
+    ]
+
 
 
 
