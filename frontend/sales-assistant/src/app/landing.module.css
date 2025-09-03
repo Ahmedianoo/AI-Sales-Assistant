@@ -1,0 +1,164 @@
+/* src/app/landing.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  /* Use the global background color variable */
+  background-color: var(--primary-bg); 
+  /* Use a consistent text color, or rely on the global body color */
+  color: #000000; 
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 700;
+  /* Use the global heading color variable */
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  /* Use a consistent text color from your palette */
+  color: var(--secondary-color);
+}
+
+.cta {
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.cta p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: #000000;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.buttonPrimary,
+.buttonSecondary {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.buttonPrimary {
+  /* Use the global accent color for the primary button */
+  background-color: var(--accent-color);
+  color: #ffffff;
+}
+
+.buttonPrimary:hover {
+  /* You may want to define a hover state in your globals or a shade of the accent color */
+  background-color: #7b7057; 
+  transform: translateY(-2px);
+}
+
+.buttonSecondary {
+  background-color: #e2e8f0; /* Keeping a light gray for contrast */
+  color: #1f2937;
+}
+
+.buttonSecondary:hover {
+  background-color: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+/* Card Styles */
+.cardsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 3rem; /* space between cards */
+  flex-wrap: wrap; /* allows wrapping on smaller screens */
+  padding: 2rem; /* space from browser edges */
+  margin-bottom: 1rem; /* space before CTA */
+}
+
+.card {
+  /*--background: linear-gradient(to right, #74ebd5 0%, #acb6e5 100%);*/
+  --background: linear-gradient(to right, #054c14 0%, #c68b14 100%);
+
+  width: 190px;
+  height: 254px;
+  padding: 5px;
+  border-radius: 1rem;
+  overflow: visible;
+  background: var(--background);
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem; /* space before CTA */
+}
+
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
+  z-index: -1;
+}
+
+.card::before {
+  /*background: linear-gradient(to bottom right, #f6d365 0%, #fda085 100%);*/
+  background: linear-gradient(to top right, #203c2a 0%, #195915 100%);
+
+  transform: rotate(2deg);
+}
+
+.card::after {
+  background: linear-gradient(to bottom right, #962916 0%, #22234a 100%);
+  transform: rotate(-2deg);
+}
+
+.cardInfo {
+  /*--color: #c9a227;*/
+  --color: #ae9e79;
+  background: var(--color);
+  color: var(--color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.7rem;
+  position: relative;
+  z-index: 2;
+  transition: color 1s;
+}
+
+.cardTitle {
+  font-weight: bold;
+  letter-spacing: 0.1em;
+}
+
+.card:hover::before,
+.card:hover::after {
+  opacity: 0;
+}
+
+.card:hover .cardInfo {
+  color: #000000;
+}

@@ -26,8 +26,9 @@ export default function RootLayout({ children }) {
       <div
           style={{
             //backgroundColor: 'var(--primary-bg)',
+            backgroundColor:'#ffffff',
             padding: "1rem",
-            //borderBottom: "1px solid #ddd",
+            borderBottom: "1px solid #ffffffff",
             position: "fixed",
             top: 0,
             width: "100%",
@@ -37,7 +38,8 @@ export default function RootLayout({ children }) {
           <TextLogo />
         </div>
 
-        <main>{children}</main>
+        <main style={{ paddingTop: "3.25rem" }}>{children}</main>
+
       </body>
     </html>
   );
