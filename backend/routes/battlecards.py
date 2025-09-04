@@ -82,8 +82,6 @@ def get_battlecards(user_id: int, db: Session = Depends(get_db)):
         .all()
     )
 
-    if not battlecards:
-        raise HTTPException(status_code=404, detail="No battlecards found for this user")
 
     return [
         BattlecardOut(
@@ -197,8 +195,6 @@ def delete_battlecard(id: int, db: Session = Depends(get_db)):
 @router.get("/user/{user_id}", response_model=List[UserCompetitorOut])
 def get_user_competitors(user_id: int, db: Session = Depends(get_db)):
     competitors = db.query(UserCompetitor).filter(UserCompetitor.user_id == user_id).all()
-    if not competitors:
-        raise HTTPException(status_code=404, detail="No competitors found for this user")
     return competitors
 
 
@@ -206,8 +202,6 @@ def get_user_competitors(user_id: int, db: Session = Depends(get_db)):
 @router.get("/competitor/{user_comp_id}", response_model=List[BattlecardOut])
 def get_battlecards_for_competitor(user_comp_id: int, db: Session = Depends(get_db)):
     battlecards = db.query(Battlecard).filter(Battlecard.user_comp_id == user_comp_id).all()
-    if not battlecards:
-        raise HTTPException(status_code=404, detail="No battlecards found for this competitor")
 
     return [
         BattlecardOut(
