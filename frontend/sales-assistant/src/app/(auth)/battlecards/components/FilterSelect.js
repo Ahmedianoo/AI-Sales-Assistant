@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { fetchCompetitors, fetchBattlecardsForUser, fetchBattlecardsforCompetitor } from "../../actions/battlecards"; 
+import { fetchCompetitors, fetchBattlecardsForUser, fetchBattlecardsforCompetitor } from "../../../actions/battlecards"; 
 
 export default function FilterSelect({ userId, onSelect }) {
   const [competitors, setCompetitors] = useState([]);

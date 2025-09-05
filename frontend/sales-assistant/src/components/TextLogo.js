@@ -1,9 +1,11 @@
 // src/app/components/TextLogo.js
 import React from 'react';
+import Link from "next/link";
 
 export default function TextLogo() {
   return (
-    <div
+    <Link 
+      href={'/'}
       style={{
         fontWeight: "bold",
         color: "var(--accent-color)",
@@ -12,6 +14,6 @@ export default function TextLogo() {
       }}
     >
       AI Sales Assistant
-    </div>
+    </Link>
   );
 }

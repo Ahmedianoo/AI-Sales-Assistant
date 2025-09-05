@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createBattlecard, fetchCompetitors } from "../../actions/battlecards";
+import { createBattlecard, fetchCompetitors } from "../../../actions/battlecards";
 
 
 export default function GenerateBattlecardForm({userId, onCreated, open, setOpen}){

@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
-import { updateBattlecard } from "../../actions/battlecards";
+import { updateBattlecard } from "../../../actions/battlecards";
 
 export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate }) {
   const [editMode, setEditMode] = useState(false);

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import GenerateBattlecardForm from "./components/GenerateBattlecardForm";
 import FilterSelect from "./components/FilterSelect";
-import {  deleteBattlecard  } from "../actions/battlecards";
+import {  deleteBattlecard  } from "../../actions/battlecards";
 import BattlecardList from "./components/BattlecardList";
 import BattlecardModal from "./components/BattlecardModal";
 
