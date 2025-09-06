@@ -24,7 +24,7 @@ const LoginPage = () => {
       // ✅ Redirect to home page on success
       router.push("/");
     } catch (err) {
-      setMessage("❌ " + (err.response?.data?.detail || "Signup failed."));
+      setMessage("❌ " + (err.response?.data?.detail || "Ligin failed."));
     } finally {
       setLoading(false);
     }
@@ -35,7 +35,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-[#FAE9C2] p-4">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
         <h1 className="text-3xl font-bold text-[#B8751C] text-center mb-6">
-          SalesAI - Sign Up
+          SalesAI - Login
         </h1>
 
         {message && (
