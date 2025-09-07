@@ -24,7 +24,7 @@ export default function AuthLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navbar />
-        <main>{children}</main>
+        <main style={{paddingTop:"3.25rem"}}>{children}</main>
       </body>
     </html>
   );

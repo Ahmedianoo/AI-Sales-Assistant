@@ -38,7 +38,7 @@ export default function RootLayout({ children }) {
           <TextLogo />
         </div>
 
-        <main style={{ paddingTop: "3.25rem" }}>{children}</main>
+        <main >{children}</main>
 
       </body>
     </html>
