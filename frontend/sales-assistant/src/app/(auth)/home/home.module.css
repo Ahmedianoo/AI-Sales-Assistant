@@ -1,0 +1,46 @@
+.btn {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  transition: background-color 0.2s ease-in-out;
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem; /* px-3 py-2 */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* gap-2 */
+  width: 100%;
+}
+
+.btn:hover {
+  background-color: var(--accent-color);
+}
+
+
+/* Chat history buttons */
+.chatBtn {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem; /* same as .btn for consistency */
+  border-radius: var(--radius);
+  transition: background-color 0.2s ease-in-out, border 0.2s ease-in-out;
+  border: none; /* no border by default */
+  background-color: transparent;
+  color: black;
+  cursor: pointer;
+  display: block;
+  word-break: break-word;
+}
+
+.chatBtn:hover {
+  background-color: #f0f0f0; /* light hover background */
+}
+
+.chatBtnActive {
+  background-color: var(--color-secondary-color);
+  color: white;
+  border: 1px solid black;
+}
+
+/* disable hover on active */
+.chatBtnActive:hover {
+  background-color: var(--color-secondary-color); /* same as active background */
+}
