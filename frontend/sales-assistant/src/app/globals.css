@@ -13,6 +13,13 @@
   --font-family-serif: 'Playfair Display', serif;
   --font-family-sans: 'Inter', sans-serif;
 
+  /* Chat UI tokens (light) */
+  --chat-user: #f1f5f9;           /* Light grey user bubble */
+  --chat-user-foreground: #000000;
+  --chat-ai: #d4e8d4;             /* Soft green AI bubble */
+  --chat-ai-foreground: #000000;
+  --sidebar-custom: #d6cfc0;      /* Warm beige sidebar */
+
   --background: oklch(1 0 0); /* #ffffff - Main background */
   --foreground: oklch(0.205 0 0); /* #1f2937 - Main text */
   --card: oklch(0.97 0 0); /* #f1f5f9 - Message bubble background */
@@ -49,6 +56,20 @@
 }
 
 .dark {
+   /* Canva theme tokens (dark) */
+  --primary-bg: #1c1a16;        /* Very dark warm background */
+  --secondary-color: #9fc2ac;   /* Muted green headings / active chat */
+  --accent-color: #cbbf9f;      /* Lighter beige/gold accent */
+  --font-family-serif: 'Playfair Display', serif;
+  --font-family-sans: 'Inter', sans-serif;
+
+  /* Chat UI tokens (dark) */
+  --chat-user: #374151;           /* Grey bubble */
+  --chat-user-foreground: #f9fafb;
+  --chat-ai: #446b48;             /* Muted green bubble */
+  --chat-ai-foreground: #f9fafb;
+  --sidebar-custom: #1f2937;      /* Dark beige/grey sidebar */
+
   --background: oklch(0.145 0 0); /* Dark background */
   --foreground: oklch(0.985 0 0); /* Light text */
   --card: oklch(0.205 0 0); /* Darker message bubbles */
@@ -85,6 +106,20 @@
 
 
 @theme inline {
+  /* Canva */
+  --color-primary-bg: var(--primary-bg);
+  --color-secondary-color: var(--secondary-color);
+  --color-accent-color: var(--accent-color);
+  --font-serif: var(--font-family-serif);
+  --font-sans-custom: var(--font-family-sans);
+
+  /* Chat UI */
+  --color-chat-user: var(--chat-user);
+  --color-chat-user-foreground: var(--chat-user-foreground);
+  --color-chat-ai: var(--chat-ai);
+  --color-chat-ai-foreground: var(--chat-ai-foreground);
+  --color-sidebar-custom: var(--sidebar-custom);
+  
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-background: var(--background);

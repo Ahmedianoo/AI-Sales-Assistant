@@ -10,7 +10,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const navItems = [
-    { name: "Home", path: "/" },
+    { name: "AI Chat", path: "/home" },
     { name: "Reports", path: "/reports" },
     { name: "Battlecards", path: "/battlecards" },
     { name: "Settings", path: "/settings" },
