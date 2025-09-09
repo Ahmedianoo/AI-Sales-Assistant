@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
-pydantic
+pydantic>=2.0.0
 python-dotenv
 sqlalchemy
 alembic
@@ -9,3 +9,14 @@ passlib[bcrypt]
 passlib
 jwt
 python-jose[cryptography]
+
+
+# Milvus client
+pymilvus==2.4.0
+marshmallow>=3.13.0,<4.0.0
+
+# Embeddings / ML
+sentence-transformers
+transformers
+
+

@@ -1,11 +1,14 @@
 from fastapi import FastAPI
-from routes import battlecards
+from routes import battlecards, milvus, ingest_search
 from routes import users
 
 app = FastAPI()
 
 app.include_router(battlecards.router)
 app.include_router(users.router)
+
+app.include_router(milvus.router)
+app.include_router(ingest_search.router)
 
 
 @app.get("/")

@@ -14,6 +14,7 @@ class Competitor(Base):
 
     # Relationships
     users = relationship("UserCompetitor", back_populates="competitor")
+    documents = relationship("RawDocument", back_populates="competitor")
 
     def __repr__(self):
         return f"<Competitor(competitor_id={self.competitor_id}, name='{self.name}')>"
