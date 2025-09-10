@@ -7,7 +7,7 @@ export default function LandingPage() {
       <header className={styles.header}>
         <h1 className={styles.title}>AI Sales Assistant</h1>
         <p className={styles.subtitle}>
-          Stay on top of your competitors. Shhhh, dont play all your cards!
+          Stay on top of your competitors. Shhhh, don't play all your cards!
         </p>
       </header>
 
