@@ -6,3 +6,4 @@ from .reports import Report
 from .battlecards import Battlecard
 from .search_history import SearchHistory
 from .alerts import Alert
+from .raw_document import RawDocument

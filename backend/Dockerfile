@@ -1,18 +1,26 @@
-# Start with a base Python image
-FROM python:3.10-slim
+FROM python:3.10-slim as base
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy requirements file and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# System dependencies for Python + Playwright
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc wget curl git \
+    libnss3 libatk-bridge2.0-0 libcups2 libxss1 libasound2 libgtk-3-0 \
+    libx11-xcb1 libxcomposite1 libxrandr2 libgbm1 libpangocairo-1.0-0 libpango-1.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy the rest of the application code
+COPY requirements.txt .
+
+# Install PyTorch CPU + Python dependencies
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
+    && pip install --no-cache-dir -r requirements.txt \
+    && rm -rf /root/.cache/pip
+
+# Install Playwright browsers
+RUN playwright install --with-deps
+
 COPY . .
 
-# Expose the port where FastAPI will run
 EXPOSE 8000
 
-# Command to run the application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

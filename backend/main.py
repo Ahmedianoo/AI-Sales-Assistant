@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import battlecards
+from routes import battlecards, milvus, ingest_search, crawl
 from routes import users
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -21,6 +21,10 @@ app.add_middleware(
 
 app.include_router(battlecards.router)
 app.include_router(users.router)
+
+app.include_router(milvus.router)
+app.include_router(ingest_search.router)
+app.include_router(crawl.router)
 
 
 @app.get("/")

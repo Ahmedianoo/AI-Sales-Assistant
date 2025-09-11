@@ -14,11 +14,18 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     # depends_on:
     #   - db   # wait for Postgres before starting
+    # depends_on:
+    #   milvus:
+    #     condition: service_healthy
+
+    # networks:
+    #   - milvus    
     dns:
     - 8.8.8.8
     - 8.8.4.4
     env_file:
       - .env
+      
 
   frontend:
     build:
@@ -35,18 +42,74 @@ services:
     - WATCHPACK_POLLING=true     
     command: npm run dev
 
-#   db:
-#     image: postgres:15
-#     container_name: postgres
-#     restart: always
+
+
+
+
+#   # --- Milvus dependencies ---
+#   etcd:
+#     image: quay.io/coreos/etcd:v3.5.13
+#     container_name: etcd
 #     environment:
-#       POSTGRES_USER: ${POSTGRES_USER}
-#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-#       POSTGRES_DB: ${POSTGRES_DB}
+#       - ETCD_AUTO_COMPACTION_MODE=revision
+#       - ETCD_AUTO_COMPACTION_RETENTION=1000
+#       - ETCD_QUOTA_BACKEND_BYTES=4294967296
+#       - ETCD_SNAPSHOT_COUNT=50000
 #     volumes:
-#       - postgres_data:/var/lib/postgresql/data
+#       - etcd_data:/etcd
+#     networks: [milvus]
+#     healthcheck:
+#       test: ["CMD", "etcdctl", "--endpoints=http://localhost:2379", "endpoint", "health"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   minio:
+#     image: minio/minio:RELEASE.2024-08-03T04-33-23Z
+#     container_name: minio
+#     environment:
+#       MINIO_ACCESS_KEY: minioadmin
+#       MINIO_SECRET_KEY: minioadmin
+#     command: ["server", "/data"]
 #     ports:
-#       - "5432:5432"
+#       - "9000:9000"
+#       - "9001:9001"
+#     volumes:
+#       - minio_data:/data
+#     networks: [milvus]
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   milvus:
+#     image: milvusdb/milvus:v2.4.10
+#     container_name: milvus
+#     depends_on:
+#       etcd:
+#         condition: service_healthy
+#       minio:
+#         condition: service_healthy
+#     environment:
+#       ETCD_ENDPOINTS: etcd:2379
+#       MINIO_ADDRESS: minio:9000
+#     ports:
+#       - "19530:19530"   # gRPC for pymilvus
+#       - "9091:9091"     # REST/metrics
+#     volumes:
+#       - milvus_data:/var/lib/milvus
+#     networks: [milvus]
+#     healthcheck:
+#       test: ["CMD", "bash", "-c", "nc -z localhost 19530"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 10
+
+# networks:
+#   milvus: {}
 
 # volumes:
-#   postgres_data:
+#   etcd_data: {}
+#   minio_data: {}
+#   milvus_data: {}
