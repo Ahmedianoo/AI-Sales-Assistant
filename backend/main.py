@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import battlecards, milvus, ingest_search
+from routes import battlecards, milvus, ingest_search, crawl
 from routes import users
 
 app = FastAPI()
@@ -9,6 +9,7 @@ app.include_router(users.router)
 
 app.include_router(milvus.router)
 app.include_router(ingest_search.router)
+app.include_router(crawl.router)
 
 
 @app.get("/")

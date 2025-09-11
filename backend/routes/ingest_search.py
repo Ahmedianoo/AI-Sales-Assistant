@@ -6,6 +6,7 @@ from db import get_db
 from models import RawDocument, UserCompetitor
 from milvus.service import insert_embeddings, search
 from milvus.schemas import SearchRequest
+from services.ingest import process_and_ingest
 
 router = APIRouter(tags=["business"])
 
@@ -27,20 +28,9 @@ class SearchResponse(BaseModel):
 
 
 @router.post("/ingest_doc", response_model=IngestDocResponse)
-def ingest_doc(req: IngestDocRequest, db: Session = Depends(get_db)):
-    # Save raw document in Postgres
-    raw = RawDocument(competitor_id=req.competitor_id, text=req.text)
-    db.add(raw)
-    db.commit()
-    db.refresh(raw)
-
-    # Chunk text into 500-character segments
-    chunks = [req.text[i:i + 500] for i in range(0, len(req.text), 500)]
-
-    # Insert embeddings into Milvus
-    insert_embeddings(req.competitor_id, raw.id, chunks)
-
-    return {"doc_id": raw.id, "chunks": len(chunks)}
+def ingest_doc(req: IngestDocRequest):
+    doc_id, num_chunks = process_and_ingest(req.competitor_id, req.text)
+    return {"doc_id": doc_id, "chunks": len(num_chunks)}
 
 
 @router.post("/search_docs", response_model=SearchResponse)
