@@ -1,12 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
-import { fetchCompetitors, fetchBattlecardsForUser, fetchBattlecardsforCompetitor } from "../../../actions/battlecards"; 
+import {
+  fetchCompetitors,
+  fetchBattlecardsForUser,
+  fetchBattlecardsforCompetitor,
+} from "../../../actions/battlecards";
 
 export default function FilterSelect({ onSelect }) {
   const [competitors, setCompetitors] = useState([]);
   const [selectedCompetitor, setSelectedCompetitor] = useState("");
-
-  
 
   useEffect(() => {
     async function loadCompetitors() {
@@ -44,10 +46,14 @@ export default function FilterSelect({ onSelect }) {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <label className="font-semibold text-gray-700">Select Competitor:</label>
+    <div className="flex items-center gap-3">
+      <label className="font-semibold text-[var(--secondary-color)] font-[var(--font-family-sans)]">
+        Select Competitor:
+      </label>
       <select
-        className="border rounded-lg px-3 py-2"
+        className="border rounded-xl px-4 py-2 bg-[var(--card)] text-[var(--foreground)] 
+                   focus:ring-2 focus:ring-[var(--secondary-color)] focus:outline-none 
+                   hover:bg-[var(--accent-color)]/20 transition"
         value={selectedCompetitor}
         onChange={(e) => handleSelect(e.target.value)}
       >

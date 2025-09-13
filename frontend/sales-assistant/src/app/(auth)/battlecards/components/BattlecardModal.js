@@ -77,8 +77,8 @@ export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         className="max-w-6xl w-full h-[85vh] overflow-y-auto rounded-3xl border 
-        border-indigo-300/60 shadow-2xl p-10 
-        bg-gradient-to-br from-indigo-50 via-white to-purple-50"
+        border-[var(--accent-color)]/50 shadow-2xl p-10 
+        bg-[var(--primary-bg)]/95"
       >
         <DialogHeader className="space-y-2">
           {editMode ? (
@@ -86,18 +86,18 @@ export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate 
               <Input
                 value={draftTitle}
                 onChange={(e) => setDraftTitle(e.target.value)}
-                className="text-2xl font-bold"
+                className="text-2xl font-bold font-[var(--font-family-sans)] text-[var(--foreground)] bg-white/70 rounded-xl"
               />
             </DialogTitle>
           ) : (
-            <DialogTitle className="text-4xl font-extrabold text-gray-900 tracking-tight">
+            <DialogTitle className="text-4xl font-extrabold tracking-tight text-[var(--foreground)] font-[var(--font-family-sans)]">
               {title}
             </DialogTitle>
           )}
           {!editMode && (
-            <DialogDescription className="text-lg text-gray-600">
+            <DialogDescription className="text-lg text-[var(--foreground)]/70 font-[var(--font-family-sans)]">
               Competitor:{" "}
-              <span className="font-semibold text-indigo-700">
+              <span className="font-semibold text-[var(--secondary-color)]">
                 {battlecard.competitor_name || `#${battlecard.user_comp_id}`}
               </span>
             </DialogDescription>
@@ -115,9 +115,9 @@ export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate 
             ? Object.entries(draftContent).map(([tag, value], idx) => (
                 <motion.div
                   key={idx}
-                  className="flex flex-col gap-3 p-6 rounded-2xl border bg-white/70 shadow-sm"
+                  className="flex flex-col gap-3 p-6 rounded-2xl border border-[var(--accent-color)]/40 bg-white/80 shadow-sm"
                 >
-                  <h3 className="text-xl font-semibold text-indigo-700">
+                  <h3 className="text-xl font-semibold text-[var(--secondary-color)] font-[var(--font-family-sans)]">
                     {tag.toUpperCase()}
                   </h3>
                   <Input
@@ -125,18 +125,19 @@ export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate 
                     onChange={(e) =>
                       setDraftContent({ ...draftContent, [tag]: e.target.value })
                     }
+                    className="bg-white/70 rounded-lg"
                   />
                 </motion.div>
               ))
             : Object.entries(content).map(([tag, value], idx) => (
                 <motion.div
                   key={idx}
-                  className="p-6 rounded-2xl border bg-white/70 shadow-sm flex flex-col gap-3"
+                  className="p-6 rounded-2xl border border-[var(--accent-color)]/40 bg-white/80 shadow-sm flex flex-col gap-3"
                 >
-                  <h3 className="text-xl font-semibold text-indigo-700">
+                  <h3 className="text-xl font-semibold text-[var(--secondary-color)] font-[var(--font-family-sans)]">
                     {tag.toUpperCase()}
                   </h3>
-                  <p className="text-lg text-gray-800 leading-relaxed break-words">
+                  <p className="text-lg text-[var(--foreground)] leading-relaxed break-words font-[var(--font-family-sans)]">
                     {value}
                   </p>
                 </motion.div>
@@ -150,7 +151,9 @@ export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate 
               checked={draftAutoRelease}
               onCheckedChange={(checked) => setDraftAutoRelease(checked)}
             />
-            <span className="text-gray-700 text-sm">Auto-release</span>
+            <span className="text-[var(--foreground)] text-sm font-[var(--font-family-sans)]">
+              Auto-release
+            </span>
           </div>
         )}
 
@@ -158,21 +161,32 @@ export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate 
         <DialogFooter className="mt-10 flex justify-end gap-3">
           {editMode ? (
             <>
-              <Button variant="outline" onClick={handleCancel}>
+              <Button
+                variant="outline"
+                onClick={handleCancel}
+                className="border-[var(--accent-color)] text-[var(--foreground)]"
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSave} className="bg-indigo-600 text-white">
+              <Button
+                onClick={handleSave}
+                className="bg-[var(--secondary-color)] text-white hover:opacity-90 hover:scale-105 active:scale-95 transition"
+              >
                 Save
               </Button>
             </>
           ) : (
             <>
-              <Button variant="outline" onClick={onClose}>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className="border-[var(--accent-color)] text-[var(--foreground)]"
+              >
                 Close
               </Button>
               <Button
                 onClick={() => setEditMode(true)}
-                className="bg-indigo-600 text-white"
+                className="bg-[var(--secondary-color)] text-white hover:opacity-90 hover:scale-105 active:scale-95 transition"
               >
                 Edit
               </Button>

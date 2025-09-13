@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 export default function BattlecardCard({ battlecard, onView, onEdit, onDelete }) {
@@ -14,23 +14,28 @@ export default function BattlecardCard({ battlecard, onView, onEdit, onDelete })
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="relative rounded-2xl shadow-2xl border-2 border-indigo-600 p-4 bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800 transition">
+      <div
+        className="relative rounded-2xl shadow-lg border 
+        border-[var(--accent-color)]/40 p-6 
+        bg-[var(--primary-bg)]/95 text-[var(--card-foreground)] 
+        transition-colors duration-200"
+      >
         {/* Header */}
-        <div className="mb-2">
-          <h3 className="text-lg font-bold text-white">
+        <div className="mb-3">
+          <h3 className="text-xl font-bold font-[var(--font-family-sans)] text-[var(--secondary-color)] truncate">
             {battlecard.title || "Untitled Battlecard"}
           </h3>
         </div>
 
         {/* Content */}
-        <div className="space-y-1">
-          <p className="text-sm text-gray-300">
+        <div className="space-y-2 font-[var(--font-family-sans)]">
+          <p className="text-sm">
             Competitor:{" "}
-            <span className="font-semibold text-indigo-400">
+            <span className="font-semibold text-[var(--accent-color)]">
               {battlecard.competitor_name || "Unknown"}
             </span>
           </p>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-[var(--foreground)]/70">
             Created:{" "}
             {battlecard.created_at
               ? new Date(battlecard.created_at).toLocaleDateString()
@@ -38,12 +43,15 @@ export default function BattlecardCard({ battlecard, onView, onEdit, onDelete })
           </p>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-2 mt-2">
+          <div className="flex flex-wrap gap-2 mt-3">
             {battlecard.content &&
               Object.keys(battlecard.content).map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold border border-purple-400"
+                  className="px-3 py-1 text-xs rounded-full 
+                  bg-[var(--secondary-color)]/10 
+                  text-[var(--secondary-color)] 
+                  font-medium border border-[var(--secondary-color)]/30"
                 >
                   {tag}
                 </span>
@@ -52,7 +60,7 @@ export default function BattlecardCard({ battlecard, onView, onEdit, onDelete })
         </div>
 
         {/* Footer (Actions) */}
-        <div className="mt-3">
+        <div className="mt-4">
           {hovered && (
             <motion.div
               className="flex gap-2"
@@ -63,21 +71,18 @@ export default function BattlecardCard({ battlecard, onView, onEdit, onDelete })
             >
               <button
                 onClick={() => onView?.(battlecard)}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm border rounded-lg bg-indigo-700 hover:bg-indigo-600 text-white transition"
+                className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg 
+                bg-[var(--secondary-color)] text-white 
+                shadow-sm hover:brightness-95 transition"
               >
                 <Eye className="w-4 h-4" /> View
               </button>
 
-              {/* <button
-                onClick={() => onEdit?.(battlecard)}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm bg-purple-600 rounded-lg hover:bg-purple-500 text-white transition"
-              >
-                <Edit className="w-4 h-4" /> Edit
-              </button> */}
-
               <button
                 onClick={() => onDelete?.(battlecard)}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm bg-red-500 rounded-lg hover:bg-red-600 text-white transition"
+                className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg 
+                bg-red-500 text-white shadow-sm 
+                hover:bg-red-600 transition"
               >
                 <Trash2 className="w-4 h-4" /> Delete
               </button>
