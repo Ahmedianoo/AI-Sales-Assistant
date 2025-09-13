@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from routes import battlecards, milvus, ingest_search, crawl
 from routes import users
+from routes import search_history
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
@@ -21,6 +22,7 @@ app.add_middleware(
 
 app.include_router(battlecards.router)
 app.include_router(users.router)
+app.include_router(search_history.router)
 
 app.include_router(milvus.router)
 app.include_router(ingest_search.router)
