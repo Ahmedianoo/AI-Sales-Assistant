@@ -19,7 +19,7 @@ def get_user_search_history(current_user: User= Depends(get_current_user), db: S
             .all()
         )
 
-        print("inside try of get search query")
+        #print("inside try of get search query")
 
         return [
             {
