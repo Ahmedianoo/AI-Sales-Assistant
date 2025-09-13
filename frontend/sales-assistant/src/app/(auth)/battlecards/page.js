@@ -11,7 +11,6 @@ export default function BattlecardsPage() {
   const [open, setOpen] = useState(false)
   const [selectedCard, setSelectedCard] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const temp = 888;
 
   const updateBattlecard = (updated) => {
     setBattlecards((prev) =>
@@ -61,11 +60,11 @@ export default function BattlecardsPage() {
 
       {/* Button Section (outside overflow-hidden) */}
       <div className="mt-6 flex justify-center gap-4">
-        <GenerateBattlecardForm userId={temp} onCreated={addBattlecard} open={open} setOpen={setOpen}/>
+        <GenerateBattlecardForm onCreated={addBattlecard} open={open} setOpen={setOpen}/>
       </div>
 
       <div className="mt-6 flex justify-center">
-        <FilterSelect userId={temp} onSelect={setBattlecards} />
+        <FilterSelect onSelect={setBattlecards} />
       </div>
       
 

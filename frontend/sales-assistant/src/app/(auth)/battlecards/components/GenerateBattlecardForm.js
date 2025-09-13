@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { createBattlecard, fetchCompetitors } from "../../../actions/battlecards";
 
 
-export default function GenerateBattlecardForm({userId, onCreated, open, setOpen}){
+export default function GenerateBattlecardForm({onCreated, open, setOpen}){
 
 
     const[competitors, setCompetitors] = useState([])
@@ -13,8 +13,7 @@ export default function GenerateBattlecardForm({userId, onCreated, open, setOpen
 
     useEffect(() =>{
         async function load() {
-            if(!userId) return
-            const data = await fetchCompetitors(userId)
+            const data = await fetchCompetitors()
             setCompetitors(data)
         }
         if(open) {
@@ -24,7 +23,7 @@ export default function GenerateBattlecardForm({userId, onCreated, open, setOpen
           setuserCompId("")
         }  
 
-    }, [open, userId]);
+    }, [open]);
 
 
     const handleSubmit = async (e) =>{

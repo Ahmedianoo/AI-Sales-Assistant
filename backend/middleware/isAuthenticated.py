@@ -12,6 +12,12 @@ load_dotenv()
 jwt_secret = os.getenv("SECRET_KEY")
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
+
+
+    print("=== Incoming Request ===")
+    print("Cookies:", request.cookies)
+    print("Headers:", request.headers)
+    
     token = request.cookies.get("jwt")
 
     if not token:

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { fetchCompetitors, fetchBattlecardsForUser, fetchBattlecardsforCompetitor } from "../../../actions/battlecards"; 
 
-export default function FilterSelect({ userId, onSelect }) {
+export default function FilterSelect({ onSelect }) {
   const [competitors, setCompetitors] = useState([]);
   const [selectedCompetitor, setSelectedCompetitor] = useState("");
 
@@ -11,7 +11,7 @@ export default function FilterSelect({ userId, onSelect }) {
   useEffect(() => {
     async function loadCompetitors() {
       try {
-        const data = await fetchCompetitors(userId);
+        const data = await fetchCompetitors();
         setCompetitors(data);
 
         // Default: show all battlecards initially
@@ -22,8 +22,8 @@ export default function FilterSelect({ userId, onSelect }) {
         onSelect([]);
       }
     }
-    if (userId) loadCompetitors();
-  }, [userId]);
+    loadCompetitors();
+  }, []);
 
   const handleSelect = async (compId) => {
     setSelectedCompetitor(compId);
@@ -32,7 +32,7 @@ export default function FilterSelect({ userId, onSelect }) {
       let data;
       if (!compId) {
         // No competitor selected → fetch all battlecards
-        data = await fetchBattlecardsForUser(userId);
+        data = await fetchBattlecardsForUser();
       } else {
         data = await fetchBattlecardsforCompetitor(compId);
       }
