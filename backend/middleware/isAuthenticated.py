@@ -11,25 +11,40 @@ from dotenv import load_dotenv
 load_dotenv()
 jwt_secret = os.getenv("SECRET_KEY")
 
-def get_current_user(request: Request, db: Session = Depends(get_db)):
+# def get_current_user(request: Request, db: Session = Depends(get_db)):
+#     token = request.cookies.get("jwt")
 
+#     if not token:
+#         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    print("=== Incoming Request ===")
-    print("Cookies:", request.cookies)
-    print("Headers:", request.headers)
+#     try:
+#         payload = jwt.decode(token, jwt_secret, algorithms=["HS256"])
+#         user = db.query(User).filter(User.user_id == payload["user_id"]).first()
+#         if not user:
+#             raise HTTPException(status_code=401, detail="Unauthorized")
+#         return user
+#     except jwt.ExpiredSignatureError:
+#         raise HTTPException(status_code=401, detail="Token expired")
+#     except jwt.InvalidTokenError:
+#         raise HTTPException(status_code=401, detail="Invalid token")
     
-    token = request.cookies.get("jwt")
-
-    if not token:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+ 
+def get_current_user(request: Request, db: Session = Depends(get_db)):
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+    else:
+        raise HTTPException(status_code=401, detail="Unauthorized - no token")
 
     try:
         payload = jwt.decode(token, jwt_secret, algorithms=["HS256"])
         user = db.query(User).filter(User.user_id == payload["user_id"]).first()
         if not user:
-            raise HTTPException(status_code=401, detail="Unauthorized")
+            raise HTTPException(status_code=401, detail="Unauthorized - wrong user")
         return user
+    
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
+   
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
