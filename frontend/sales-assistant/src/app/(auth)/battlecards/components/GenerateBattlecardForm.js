@@ -110,9 +110,13 @@ export default function GenerateBattlecardForm({ onCreated, open, setOpen }) {
 
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-[var(--secondary-color)] text-white font-semibold hover:opacity-90 hover:scale-105 active:scale-95 transition shadow-md"
+                  disabled={!title || !userCompId}
+                  className={`px-5 py-2.5 rounded-xl font-semibold transition shadow-md bg-[var(--secondary-color)] text-white 
+                            ${!title || !userCompId 
+                            ? "opacity-50 cursor-not-allowed" 
+                            : "hover:opacity-90 hover:scale-105 active:scale-95"}`}
                 >
-                  Save
+                  Generate
                 </button>
               </div>
             </form>
