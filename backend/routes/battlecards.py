@@ -81,6 +81,7 @@ def get_battlecards(user: User = Depends(get_current_user), db: Session = Depend
         db.query(Battlecard)
         .join(UserCompetitor, Battlecard.user_comp_id == UserCompetitor.user_comp_id)
         .filter(UserCompetitor.user_id == user.user_id)
+        .order_by(Battlecard.created_at.desc())
         .all()
     )
 
@@ -231,7 +232,7 @@ def get_battlecards_for_competitor(user_comp_id: int, db: Session = Depends(get_
         raise HTTPException(status_code=403, detail="Not authorized to view battlecards for this competitor")
 
 
-    battlecards = db.query(Battlecard).filter(Battlecard.user_comp_id == user_comp_id).all()
+    battlecards = db.query(Battlecard).filter(Battlecard.user_comp_id == user_comp_id).order_by(Battlecard.created_at.desc()).all()
 
     return [
         BattlecardOut(

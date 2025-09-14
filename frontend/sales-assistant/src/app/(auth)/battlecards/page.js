@@ -24,7 +24,7 @@ export default function BattlecardsPage() {
   };
 
   const addBattlecard = (newCard) => {
-    setBattlecards((prev) => [...prev, newCard]);
+    setBattlecards((prev) => [newCard, ...prev]);
   };
 
   return (
