@@ -5,6 +5,7 @@ import FilterSelect from "./components/FilterSelect";
 import { deleteBattlecard } from "../../actions/battlecards";
 import BattlecardList from "./components/BattlecardList";
 import BattlecardModal from "./components/BattlecardModal";
+import ConfirmDialog from "./components/ConfirmDialog";
 
 export default function BattlecardsPage() {
   const [battlecards, setBattlecards] = useState([]);
@@ -12,6 +13,7 @@ export default function BattlecardsPage() {
   const [selectedCard, setSelectedCard] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setloading] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const updateBattlecard = (updated) => {
     setBattlecards((prev) =>
@@ -94,17 +96,34 @@ export default function BattlecardsPage() {
           }}
           loading={loading}
           onDelete={async (card) => {
-            if (!confirm("Are you sure you want to delete this battlecard?"))
-              return;
-            const success = await deleteBattlecard(card.battlecard_id);
-            if (success) {
-              setBattlecards((prev) =>
-                prev.filter((c) => c.battlecard_id !== card.battlecard_id)
-              );
-            }
+            setSelectedCard(card);
+            setConfirmOpen(true);
           }}
         />
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={async () => {
+          if (selectedCard) {
+            const success = await deleteBattlecard(selectedCard.battlecard_id);
+            if (success) {
+              setBattlecards((prev) =>
+                prev.filter((c) => c.battlecard_id !== selectedCard.battlecard_id)
+              );
+              setSelectedCard(null);
+            }
+          }
+          setConfirmOpen(false);
+        }}
+        message={
+          selectedCard
+            ? `Are you sure you want to delete the battlecard "${selectedCard.title}"?`
+            : "Are you sure you want to delete this battlecard?"
+        }        
+      />
+
 
       {/* Battlecard Detail Modal */}
       <BattlecardModal
