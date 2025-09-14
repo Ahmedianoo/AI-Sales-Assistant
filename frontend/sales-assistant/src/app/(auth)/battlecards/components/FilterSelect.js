@@ -6,7 +6,7 @@ import {
   fetchBattlecardsforCompetitor,
 } from "../../../actions/battlecards";
 
-export default function FilterSelect({ onSelect }) {
+export default function FilterSelect({ onSelect, setloading }) {
   const [competitors, setCompetitors] = useState([]);
   const [selectedCompetitor, setSelectedCompetitor] = useState("");
 
@@ -29,6 +29,7 @@ export default function FilterSelect({ onSelect }) {
 
   const handleSelect = async (compId) => {
     setSelectedCompetitor(compId);
+    setloading(true);
 
     try {
       let data;
@@ -43,6 +44,7 @@ export default function FilterSelect({ onSelect }) {
       console.error(err);
       onSelect([]);
     }
+    setloading(false);
   };
 
   return (

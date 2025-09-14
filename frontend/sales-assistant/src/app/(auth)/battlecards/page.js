@@ -11,6 +11,7 @@ export default function BattlecardsPage() {
   const [open, setOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setloading] = useState(false);
 
   const updateBattlecard = (updated) => {
     setBattlecards((prev) =>
@@ -76,7 +77,7 @@ export default function BattlecardsPage() {
       </div>
 
       <div className="mt-6 flex justify-center">
-        <FilterSelect onSelect={setBattlecards} />
+        <FilterSelect onSelect={setBattlecards} setloading={setloading}/>
       </div>
 
       {/* Battlecards List */}
@@ -91,6 +92,7 @@ export default function BattlecardsPage() {
             setSelectedCard(card);
             setModalOpen(true);
           }}
+          loading={loading}
           onDelete={async (card) => {
             if (!confirm("Are you sure you want to delete this battlecard?"))
               return;
