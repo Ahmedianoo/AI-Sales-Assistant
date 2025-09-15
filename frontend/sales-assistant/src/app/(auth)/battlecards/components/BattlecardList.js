@@ -2,7 +2,16 @@
 
 import BattlecardCard from "./BattlecardCard";
 
-export default function BattlecardList({ battlecards, onView, onEdit, onDelete }) {
+export default function BattlecardList({ battlecards, onView, onEdit, onDelete, loading }) {
+
+  if (loading) {
+    return (
+      <p className="text-[var(--foreground)]/60 text-center mt-6 font-[var(--font-family-sans)] italic">
+        Loading...
+      </p>
+    );
+  }
+
   if (!battlecards || battlecards.length === 0) {
     return (
       <p className="text-[var(--foreground)]/60 text-center mt-6 font-[var(--font-family-sans)] italic">
