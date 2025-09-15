@@ -22,3 +22,6 @@ transformers
 # Web crawling
 crawl4ai
 playwright
+
+#APScheduler
+apscheduler
