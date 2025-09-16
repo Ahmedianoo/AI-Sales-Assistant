@@ -22,7 +22,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    print("called scheduler in main")
+#    print("called scheduler in main", flush=True)
     start_scheduler()
 
 app.include_router(battlecards.router)
