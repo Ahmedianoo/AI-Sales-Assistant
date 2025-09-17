@@ -1,25 +1,20 @@
-# Core framework
+
 fastapi
 uvicorn[standard]
-
-# Config & validation
-pydantic
-pydantic-settings
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
 python-dotenv
-
-# Database & ORM
 sqlalchemy
 alembic
 psycopg2-binary
-
-# Security & Auth
 passlib[bcrypt]
+passlib
+jwt
 python-jose[cryptography]
-PyJWT   # replaces 'jwt' package (deprecated/ambiguous)
 
 # Milvus client
-pymilvus
-marshmallow
+pymilvus==2.4.0
+marshmallow>=3.13.0,<4.0.0
 
 # Embeddings / ML
 sentence-transformers
@@ -28,6 +23,14 @@ transformers
 # Web crawling
 crawl4ai
 playwright
+
+#APScheduler
+apscheduler
+
+# Security & Auth
+python-jose[cryptography]
+PyJWT   # replaces 'jwt' package (deprecated/ambiguous)
+
 
 # LangGraph & LangChain
 langchain
@@ -39,5 +42,4 @@ langchain-ollama   # integration layer for Ollama
 ollama
 
 sentence-transformers
-#APScheduler
-apscheduler
+
