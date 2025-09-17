@@ -25,3 +25,13 @@ playwright
 
 #APScheduler
 apscheduler
+
+
+# LangGraph & LangChain
+langchain
+langchain-community
+langgraph
+langchain-ollama   # integration layer for Ollama
+
+# Ollama client
+ollama
