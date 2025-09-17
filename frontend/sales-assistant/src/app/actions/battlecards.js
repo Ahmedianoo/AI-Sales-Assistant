@@ -1,68 +1,44 @@
-"use server";
+"use client";
+import api from "@/utils/axios";
 
 export async function fetchBattlecardsforCompetitor(user_comp_id) {
-  const res = await fetch(`http://backend:8000/battlecards/competitor/${user_comp_id}`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) throw new Error("Failed to fetch battlecards");
-  return res.json();
+  const res = await api.get(`/battlecards/competitor/${user_comp_id}`);
+  return res.data;
 }
 
-export async function fetchBattlecardsForUser(user_id) {
-  const res = await fetch(`http://backend:8000/battlecards/${user_id}`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) throw new Error("Failed to fetch battlecards");
-  return res.json();
+export async function fetchBattlecardsForUser() {
+  const res = await api.get(`/battlecards/`);
+  return res.data;
 }
 
 
-export async function fetchCompetitors(user_id) {
-  const res = await fetch(`http://backend:8000/battlecards/user/${user_id}`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) throw new Error("Failed to fetch competitors");
-  return res.json();
+export async function fetchCompetitors() {
+  const res = await api.get(`/battlecards/user/`);
+  return res.data;
 }
 
 
 export async function createBattlecard({ title, user_comp_id, content, auto_release }) {
-  const res = await fetch("http://backend:8000/battlecards/", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, user_comp_id, content, auto_release }),
+  const res = await api.post(`/battlecards/`, {
+    title,
+    user_comp_id,
+    content,
+    auto_release,
   });
-
-  if (!res.ok) throw new Error("Failed to create battlecard");
-  return res.json();
+  return res.data;
 }
 
 
 export async function updateBattlecard(battlecardId, updatedData) {
-  const res = await fetch(`http://backend:8000/battlecards/${battlecardId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updatedData),
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to update battlecard");
-  }
-
-  return res.json();
+  const res = await api.put(`/battlecards/${battlecardId}`, updatedData);
+  return res.data;
 }
 
 
 
 export async function deleteBattlecard(battlecardId) {
-  const res = await fetch(`http://backend:8000/battlecards/${battlecardId}`, {
-    method: "DELETE",
-  });
-  if (!res.ok) throw new Error("Failed to delete battlecard");
-  return true; 
+  await api.delete(`/battlecards/${battlecardId}`);
+  return true;
 }
 
 

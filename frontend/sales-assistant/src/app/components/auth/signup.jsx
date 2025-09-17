@@ -20,8 +20,10 @@ export default function SignupPage() {
     setMessage("");
 
     try {
-      await axios.post("http://localhost:8000/users/signup", form);
-      router.push("/");
+      const res = await axios.post("http://localhost:8000/users/signup", form);
+      localStorage.setItem("jwt", res.data.token);
+      router.push("/home");
+
     } catch (err) {
       setMessage("❌ " + (err.response?.data?.detail || "Signup failed."));
     } finally {

@@ -51,8 +51,16 @@ class UserOut(UserBase):
     user_id: int
     created_at: datetime.datetime
 
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True
+    
+    model_config = { 
+        "from_attributes": True
+    }
+
+class AuthResponse(BaseModel):
+    token: str
+    user: UserOut
 
 #pass hash
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -60,8 +68,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 #signup
-@router.post("/signup", response_model=UserOut)
-def create_user(response:Response, user: UserCreate, db: Session = Depends(get_db)):
+@router.post("/signup", response_model=AuthResponse)
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
     # check if user exists
     existing_user = db.query(User).filter(User.email == user.email).first()
@@ -84,40 +92,46 @@ def create_user(response:Response, user: UserCreate, db: Session = Depends(get_d
     db.refresh(new_user)
     
     token = create_access_token({"user_id": new_user.user_id})
-    response.set_cookie(
-        key="jwt",
-        value=token,
-        httponly=True,
-        samesite="strict",
-        secure=False,   # set True if HTTPS
-        max_age=15 * 24 * 60 * 60  # 15 days
-    )
 
-    return new_user
+    # response.set_cookie(
+    #     key="jwt",
+    #     value=token,
+    #     httponly=True,
+    #     samesite="strict",
+    #     secure=False,   # set True if HTTPS
+    #     max_age=15 * 24 * 60 * 60  # 15 days
+    # )
 
-
+    return {
+        "token": token,
+        "user": UserOut.model_validate(new_user) 
+    }
 
 
 
 # login
-@router.post("/login", response_model=UserOut)
-def login_user(response: Response, login_data: LoginRequest, db: Session = Depends(get_db)):
+@router.post("/login", response_model=AuthResponse)
+def login_user(login_data: LoginRequest, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.email == login_data.email).first()
         if not user or not pwd_context.verify(login_data.password, user.password_hash):
             raise HTTPException(status_code=400, detail="Invalid email or password")
 
         token = create_access_token({"user_id": user.user_id})
-        response.set_cookie(
-            key="jwt",
-            value=token,
-            httponly=True,
-            samesite="strict",
-            secure=False,   # set True if HTTPS
-            max_age=15 * 24 * 60 * 60  # 15 days
-        )
+        # response.set_cookie(
+        #     key="jwt",
+        #     value=token,
+        #     httponly=True,
+        #     samesite="none",
+        #     path = "/",
+        #     secure=False,   # set True if HTTPS
+        #     max_age=15 * 24 * 60 * 60  # 15 days
+        # )
 
-        return user
+        return {
+        "token": token,
+        "user": UserOut.model_validate(user) 
+    }
 
     except HTTPException:
         raise
@@ -128,19 +142,17 @@ def login_user(response: Response, login_data: LoginRequest, db: Session = Depen
 
 
 
-#logout
-@router.post("/logout")
-def logout_user(response: Response):
-    try:
-        response.delete_cookie(key="jwt")
-        return {"message": "Logged out successfully"}
-    except Exception as e:
-        # log the error if needed
-        print("Logout error:", str(e))
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+# #logout
+# @router.post("/logout")
+# def logout_user(response: Response):
+#     try:
+#         response.delete_cookie(key="jwt")
+#         return {"message": "Logged out successfully"}
+#     except Exception as e:
+#         # log the error if needed
+#         print("Logout error:", str(e))
+#         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-
-
 
 
 @router.get("/me")

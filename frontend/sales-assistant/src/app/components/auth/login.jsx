@@ -20,8 +20,10 @@ const LoginPage = () => {
     setMessage("");
 
     try {
-      await axios.post("http://localhost:8000/users/login", form);
-      router.push("/");
+      const res = await axios.post("http://localhost:8000/users/login", form);
+      //console.log(res.data.token)
+      localStorage.setItem("jwt", res.data.token);
+      router.push("/home");
     } catch (err) {
       setMessage("❌ " + (err.response?.data?.detail || "Login failed."));
     } finally {

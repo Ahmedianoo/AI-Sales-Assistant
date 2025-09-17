@@ -4,8 +4,10 @@ from sqlalchemy.orm import Session
 from typing import List, Optional, Any
 import datetime
 from models.battlecards import Battlecard
+from models.users import User
 from models.user_competitor import UserCompetitor
 from db import get_db 
+from middleware.isAuthenticated import get_current_user
 
 
 
@@ -73,12 +75,13 @@ class UserCompetitorOut(UserCompetitorBase):
 
 
 
-@router.get("/{user_id}", response_model=List[BattlecardOut])
-def get_battlecards(user_id: int, db: Session = Depends(get_db)):
+@router.get("/", response_model=List[BattlecardOut])
+def get_battlecards(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     battlecards = (
         db.query(Battlecard)
         .join(UserCompetitor, Battlecard.user_comp_id == UserCompetitor.user_comp_id)
-        .filter(UserCompetitor.user_id == user_id)
+        .filter(UserCompetitor.user_id == user.user_id)
+        .order_by(Battlecard.created_at.desc())
         .all()
     )
 
@@ -101,7 +104,15 @@ def get_battlecards(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=BattlecardOut)
-def create_battlecard(battlecard: BattlecardCreate, db: Session = Depends(get_db)):
+def create_battlecard(battlecard: BattlecardCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+
+    user_competitor = db.query(UserCompetitor).filter(
+        UserCompetitor.user_comp_id == battlecard.user_comp_id,
+        UserCompetitor.user_id == user.user_id
+    ).first()
+    if not user_competitor:
+        raise HTTPException(status_code=403, detail="Not authorized to use this competitor")
+
     new_battlecard = Battlecard(
         user_comp_id=battlecard.user_comp_id, 
         title=battlecard.title, 
@@ -125,10 +136,13 @@ def create_battlecard(battlecard: BattlecardCreate, db: Session = Depends(get_db
 
 
 @router.get("/{id}", response_model=BattlecardOut)
-def get_a_battlecard(id: int, db: Session = Depends(get_db)):
+def get_a_battlecard(id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     battlecard = db.query(Battlecard).filter(Battlecard.battlecard_id == id).first()
     if not battlecard:
         raise HTTPException(status_code=404, detail="Battlecard not found")
+
+    if battlecard.user_competitor.user_id != user.user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to view this battlecard")    
     
     return BattlecardOut(
         battlecard_id=battlecard.battlecard_id,
@@ -143,10 +157,14 @@ def get_a_battlecard(id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{id}", response_model=BattlecardOut)
-def update_battlecard(id: int, battlecard_update: BattlecardUpdate, db: Session = Depends(get_db)):
+def update_battlecard(id: int, battlecard_update: BattlecardUpdate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     battlecard = db.query(Battlecard).filter(Battlecard.battlecard_id == id).first()
     if not battlecard:
         raise HTTPException(status_code=404, detail="Battlecard not found")
+
+    if battlecard.user_competitor.user_id != user.user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this battlecard")
+
     
     updated_data = battlecard_update.dict(exclude_unset=True)
     for key, value in updated_data.items():
@@ -168,10 +186,13 @@ def update_battlecard(id: int, battlecard_update: BattlecardUpdate, db: Session 
 
 
 @router.delete("/{id}", response_model=BattlecardOut)  
-def delete_battlecard(id: int, db: Session = Depends(get_db)):
+def delete_battlecard(id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     battlecard = db.query(Battlecard).filter(Battlecard.battlecard_id == id).first()
     if not battlecard:
         raise HTTPException(status_code=404, detail="Battlecard not found")
+    
+    if battlecard.user_competitor.user_id != user.user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this battlecard")
     
     response = BattlecardOut(
         battlecard_id=battlecard.battlecard_id,
@@ -192,16 +213,26 @@ def delete_battlecard(id: int, db: Session = Depends(get_db)):
     
     
     
-@router.get("/user/{user_id}", response_model=List[UserCompetitorOut])
-def get_user_competitors(user_id: int, db: Session = Depends(get_db)):
-    competitors = db.query(UserCompetitor).filter(UserCompetitor.user_id == user_id).all()
+@router.get("/user/", response_model=List[UserCompetitorOut])
+def get_user_competitors(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    competitors = db.query(UserCompetitor).filter(UserCompetitor.user_id == user.user_id).all()
     return competitors
 
 
 
 @router.get("/competitor/{user_comp_id}", response_model=List[BattlecardOut])
-def get_battlecards_for_competitor(user_comp_id: int, db: Session = Depends(get_db)):
-    battlecards = db.query(Battlecard).filter(Battlecard.user_comp_id == user_comp_id).all()
+def get_battlecards_for_competitor(user_comp_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+
+    user_competitor = db.query(UserCompetitor).filter(
+        UserCompetitor.user_comp_id == user_comp_id,
+        UserCompetitor.user_id == user.user_id
+    ).first()
+
+    if not user_competitor:
+        raise HTTPException(status_code=403, detail="Not authorized to view battlecards for this competitor")
+
+
+    battlecards = db.query(Battlecard).filter(Battlecard.user_comp_id == user_comp_id).order_by(Battlecard.created_at.desc()).all()
 
     return [
         BattlecardOut(

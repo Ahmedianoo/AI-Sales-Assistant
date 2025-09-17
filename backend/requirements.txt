@@ -39,3 +39,5 @@ langchain-ollama   # integration layer for Ollama
 ollama
 
 sentence-transformers
+#APScheduler
+apscheduler

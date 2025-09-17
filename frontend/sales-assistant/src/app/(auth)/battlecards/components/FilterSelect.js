@@ -1,17 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
-import { fetchCompetitors, fetchBattlecardsForUser, fetchBattlecardsforCompetitor } from "../../../actions/battlecards"; 
+import {
+  fetchCompetitors,
+  fetchBattlecardsForUser,
+  fetchBattlecardsforCompetitor,
+} from "../../../actions/battlecards";
 
-export default function FilterSelect({ userId, onSelect }) {
+export default function FilterSelect({ onSelect, setloading }) {
   const [competitors, setCompetitors] = useState([]);
   const [selectedCompetitor, setSelectedCompetitor] = useState("");
-
-  
 
   useEffect(() => {
     async function loadCompetitors() {
       try {
-        const data = await fetchCompetitors(userId);
+        const data = await fetchCompetitors();
         setCompetitors(data);
 
         // Default: show all battlecards initially
@@ -22,17 +24,18 @@ export default function FilterSelect({ userId, onSelect }) {
         onSelect([]);
       }
     }
-    if (userId) loadCompetitors();
-  }, [userId]);
+    loadCompetitors();
+  }, []);
 
   const handleSelect = async (compId) => {
     setSelectedCompetitor(compId);
+    setloading(true);
 
     try {
       let data;
       if (!compId) {
         // No competitor selected → fetch all battlecards
-        data = await fetchBattlecardsForUser(userId);
+        data = await fetchBattlecardsForUser();
       } else {
         data = await fetchBattlecardsforCompetitor(compId);
       }
@@ -41,13 +44,18 @@ export default function FilterSelect({ userId, onSelect }) {
       console.error(err);
       onSelect([]);
     }
+    setloading(false);
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <label className="font-semibold text-gray-700">Select Competitor:</label>
+    <div className="flex items-center gap-3">
+      <label className="font-semibold text-[var(--secondary-color)] font-[var(--font-family-sans)]">
+        Select Competitor:
+      </label>
       <select
-        className="border rounded-lg px-3 py-2"
+        className="border rounded-xl px-4 py-2 bg-[var(--card)] text-[var(--foreground)] 
+                   focus:ring-2 focus:ring-[var(--secondary-color)] focus:outline-none 
+                   hover:bg-[var(--accent-color)]/20 transition"
         value={selectedCompetitor}
         onChange={(e) => handleSelect(e.target.value)}
       >
