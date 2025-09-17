@@ -27,8 +27,11 @@ class BattlecardBase(BaseModel):
 
 #-----Create-----
 
-class BattlecardCreate(BattlecardBase):
-    pass
+class BattlecardCreate(BaseModel):
+    user_comp_id: int
+    title: str
+    query: Optional[str] = None
+    auto_release: Optional[bool] = False
 
 
 
@@ -112,11 +115,13 @@ def create_battlecard(battlecard: BattlecardCreate, db: Session = Depends(get_db
     ).first()
     if not user_competitor:
         raise HTTPException(status_code=403, detail="Not authorized to use this competitor")
+    
+
 
     new_battlecard = Battlecard(
         user_comp_id=battlecard.user_comp_id, 
         title=battlecard.title, 
-        content=battlecard.content, 
+        content=[], ##the content will be generated later based on the query 
         auto_release=battlecard.auto_release
     )
     db.add(new_battlecard)

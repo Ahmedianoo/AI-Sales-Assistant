@@ -18,11 +18,11 @@ export async function fetchCompetitors() {
 }
 
 
-export async function createBattlecard({ title, user_comp_id, content, auto_release }) {
+export async function createBattlecard({ title, user_comp_id, query, auto_release }) {
   const res = await api.post(`/battlecards/`, {
     title,
     user_comp_id,
-    content,
+    query,
     auto_release,
   });
   return res.data;
