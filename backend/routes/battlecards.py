@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import List, Optional, Any
+from langgraph_app.battlecards_graph.graphs import battlecard_graph
+from langgraph_app.battlecards_graph.state import BattlecardState
 import datetime
 from models.battlecards import Battlecard
 from models.users import User
@@ -117,11 +119,21 @@ def create_battlecard(battlecard: BattlecardCreate, db: Session = Depends(get_db
         raise HTTPException(status_code=403, detail="Not authorized to use this competitor")
     
 
+    initial_state = BattlecardState(
+        query = battlecard.query or "",
+        user_id = user.user_id,
+        competitor_ids = [user_competitor.competitor_id],
+        top_k = 5
+    )
+
+
+    final_state = battlecard_graph.invoke(initial_state)
+    
 
     new_battlecard = Battlecard(
         user_comp_id=battlecard.user_comp_id, 
         title=battlecard.title, 
-        content=[], ##the content will be generated later based on the query 
+        content=final_state.content if final_state and final_state.content else {}, ##the content will be generated later based on the query 
         auto_release=battlecard.auto_release
     )
     db.add(new_battlecard)
