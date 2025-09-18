@@ -2,6 +2,7 @@ from models import RawDocument
 from milvus.service import insert_embeddings
 from db import SessionLocal
 import re
+import datetime
 
 
 
@@ -25,7 +26,7 @@ def split_markdown(text: str, max_length: int = 500):
 def process_and_ingest(competitor_id: int, text: str, chunk_size: int = 500):
     db = SessionLocal()
     try:
-        raw = RawDocument(competitor_id=competitor_id, text=text)
+        raw = RawDocument(competitor_id=competitor_id, text=text, scraped_at = datetime.datetime.now())
         db.add(raw)
         db.commit()
         db.refresh(raw)
