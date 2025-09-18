@@ -7,6 +7,7 @@ from models import RawDocument, UserCompetitor
 from milvus.service import insert_embeddings, search
 from milvus.schemas import SearchRequest
 from services.ingest import process_and_ingest
+from services.search import search_documents
 
 router = APIRouter(tags=["business"])
 
@@ -34,30 +35,6 @@ def ingest_doc(req: IngestDocRequest):
 
 
 @router.post("/search_docs", response_model=SearchResponse)
-def search_docs(req: SearchRequest, db: Session = Depends(get_db)):
-    # Determine which competitor_ids are available for this user
-    if not req.competitor_ids:
-        competitor_ids = [
-            uc.competitor_id
-            for uc in db.query(UserCompetitor).filter(UserCompetitor.user_id == req.user_id).all()
-        ]
-    else:
-        competitor_ids = req.competitor_ids
-
-    # Search in Milvus
-    hits = search(req.user_id, competitor_ids, req.query, req.top_k)
-
-    # Map back to Postgres documents
-    docs = db.query(RawDocument).filter(
-        RawDocument.id.in_([h["doc_id"] for h in hits])
-    ).all()
-
-    results = [
-        SearchResult(
-            hit=h,
-            text=next((d.text for d in docs if d.id == h["doc_id"]), None)
-        )
-        for h in hits
-    ]
-
+def search_docs(req: SearchRequest):
+    results = search_documents(req.user_id, req.competitor_ids, req.query, req.top_k)
     return {"results": results}
