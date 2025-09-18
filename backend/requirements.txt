@@ -45,11 +45,3 @@ sentence-transformers
 
 
 
-# LangGraph & LangChain
-langchain
-langchain-community
-langgraph
-langchain-ollama   # integration layer for Ollama
-
-# Ollama client
-ollama
