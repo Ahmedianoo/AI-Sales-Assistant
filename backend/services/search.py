@@ -2,12 +2,13 @@ from models import RawDocument, UserCompetitor
 from milvus.service import search
 from db import SessionLocal
 from typing import List 
-from routes.ingest_search import SearchResult
+
  
 
 
 
-def search_documents(user_id: int, competitor_ids: List[int], query: str, top_k: int = 5) -> List[SearchResult]:
+def search_documents(user_id: int, competitor_ids: List[int], query: str, top_k: int = 5):
+    from routes.ingest_search import SearchResult
     db = SessionLocal()
     try:
         if not competitor_ids:
