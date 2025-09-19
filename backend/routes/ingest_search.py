@@ -36,4 +36,6 @@ def ingest_doc(req: IngestDocRequest):
 @router.post("/search_docs", response_model=SearchResponse)
 def search_docs(req: SearchRequest):
     results = search_documents(req.user_id, req.competitor_ids, req.query, req.top_k)
+def search_docs(req: SearchRequest):
+    results = search_documents(req.user_id, req.competitor_ids, req.query, req.top_k)
     return {"results": results}
