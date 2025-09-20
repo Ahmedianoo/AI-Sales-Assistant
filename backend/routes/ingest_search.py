@@ -8,6 +8,7 @@ from milvus.service import insert_embeddings, search
 from milvus.schemas import SearchRequest
 from services.ingest import process_and_ingest
 from services.search import search_documents
+from services.schemas import SearchResult
 
 router = APIRouter(tags=["business"])
 
@@ -20,9 +21,7 @@ class IngestDocResponse(BaseModel):
     doc_id: int
     chunks: int
 
-class SearchResult(BaseModel):
-    hit: Dict[str, Any]
-    text: Optional[str]
+
 
 class SearchResponse(BaseModel):
     results: List[SearchResult]
@@ -35,6 +34,8 @@ def ingest_doc(req: IngestDocRequest):
 
 
 @router.post("/search_docs", response_model=SearchResponse)
+def search_docs(req: SearchRequest):
+    results = search_documents(req.user_id, req.competitor_ids, req.query, req.top_k)
 def search_docs(req: SearchRequest):
     results = search_documents(req.user_id, req.competitor_ids, req.query, req.top_k)
     return {"results": results}

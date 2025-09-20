@@ -10,4 +10,4 @@ class SearchRequest(BaseModel):
     user_id: int
     competitor_ids: Optional[List[int]] = None
     query: str
-    top_k: int = 5
+    top_k: int = 5    

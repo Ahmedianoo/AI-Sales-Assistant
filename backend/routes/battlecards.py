@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import List, Optional, Any
+from langgraph_app.battlecards_graph.graphs import battlecard_graph
+from langgraph_app.battlecards_graph.state import BattlecardState
 import datetime
 from models.battlecards import Battlecard
 from models.users import User
@@ -27,8 +29,11 @@ class BattlecardBase(BaseModel):
 
 #-----Create-----
 
-class BattlecardCreate(BattlecardBase):
-    pass
+class BattlecardCreate(BaseModel):
+    user_comp_id: int
+    title: str
+    query: Optional[str] = None
+    auto_release: Optional[bool] = False
 
 
 
@@ -104,7 +109,7 @@ def get_battlecards(user: User = Depends(get_current_user), db: Session = Depend
 
 
 @router.post("/", response_model=BattlecardOut)
-def create_battlecard(battlecard: BattlecardCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+async def create_battlecard(battlecard: BattlecardCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
 
     user_competitor = db.query(UserCompetitor).filter(
         UserCompetitor.user_comp_id == battlecard.user_comp_id,
@@ -112,11 +117,26 @@ def create_battlecard(battlecard: BattlecardCreate, db: Session = Depends(get_db
     ).first()
     if not user_competitor:
         raise HTTPException(status_code=403, detail="Not authorized to use this competitor")
+    
+    competiror_name = user_competitor.competitor.name
+    llm_query = f"Generate a competitor battlecard for {competiror_name}. {battlecard.query}" if battlecard.query else f"Generate a general competitor battlecard for {competiror_name}."
+    
+
+    initial_state = BattlecardState(
+        query = llm_query or "",
+        user_id = user.user_id,
+        competitor_ids = [user_competitor.competitor_id],
+        top_k = 5
+    )
+
+
+    final_state = await battlecard_graph.ainvoke(initial_state)
+    
 
     new_battlecard = Battlecard(
         user_comp_id=battlecard.user_comp_id, 
         title=battlecard.title, 
-        content=battlecard.content, 
+        content=final_state.get("content", {}) if final_state else {}, ##the content will be generated later based on the query 
         auto_release=battlecard.auto_release
     )
     db.add(new_battlecard)
