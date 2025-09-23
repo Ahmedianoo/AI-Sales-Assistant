@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from routes import battlecards, milvus, ingest_search, crawl
 from routes import users
-from routes import search_history
+from routes import search_history, ai_chat
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
@@ -33,7 +33,7 @@ app.include_router(milvus.router)
 app.include_router(ingest_search.router)
 app.include_router(crawl.router)
 
-
+app.include_router(ai_chat.router)
 
 @app.get("/")
 

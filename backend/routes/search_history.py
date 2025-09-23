@@ -40,7 +40,7 @@ class SearchCreate(BaseModel):
 
 @router.post("/")
 def save_search(search: SearchCreate, current_user: User =Depends(get_current_user), db: Session = Depends(get_db)):
-    print("POST endpoint hit")
+    #print("POST endpoint hit")
     try:
         new_search = SearchHistory(
             user_id=current_user.user_id,

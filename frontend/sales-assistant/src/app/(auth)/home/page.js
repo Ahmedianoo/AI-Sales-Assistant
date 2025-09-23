@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { Menu, Send, Plus, UserIcon, BotIcon } from "lucide-react"
 import styles from './home.module.css'
 import { fetchSearchHistory, saveSearchQuery } from "@/app/actions/searchHistory"
+import { call_to_chatbot } from "@/app/actions/chatbot"
 
 export default function Home() {
   const [messages, setMessages] = useState([])
@@ -74,16 +75,31 @@ export default function Home() {
     setInputValue("")
     setIsLoading(true) // start loading for AI response
 
-    setTimeout(() => {
-      const aiResponse = {
+    try {
+      // Call the separate function to post the message and get the AI's response
+      console.log("Sending message to backend: ", newMessage.text)
+      const aiResponseText = await call_to_chatbot(newMessage.text);
+
+      // Add the AI's response to the chat
+      const newAIResponse = {
         id: Date.now() + 1,
-        text: "This is a simulated AI response to: " + newMessage.text,
+        text: aiResponseText,
         isUser: false,
         timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, aiResponse])
-      setIsLoading(false)
-    }, 1000)
+      };
+      setMessages((prev) => [...prev, newAIResponse]);
+    } catch (error) {
+      // Handle the error from the postMessage function
+      const errorResponse = {
+        id: Date.now() + 1,
+        text: error.message,
+        isUser: false,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorResponse]);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const handleKeyDown = (e) => {
@@ -197,7 +213,7 @@ export default function Home() {
                     <div
                       className="px-4 py-3 rounded-lg break-words"
                       style={{
-                        maxWidth: "36rem",
+                        maxWidth: "45rem",
                         backgroundColor: message.isUser
                           ? "var(--color-chat-user)"
                           : "var(--color-chat-ai)",
