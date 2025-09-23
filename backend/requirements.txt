@@ -10,6 +10,7 @@ passlib[bcrypt]
 passlib
 jwt
 python-jose[cryptography]
+markdown-it
 
 # Milvus client
 pymilvus==2.4.0
@@ -29,14 +30,15 @@ apscheduler
 
 # LangGraph & LangChain
 langchain
-langchain-community
+#langchain-community
 langgraph
+langchain-tavily
 langchain-ollama   # integration layer for Ollama
 langchain-groq     # integration layer for Groq API
 langchain-google-genai  # integration layer for Gemini API
 
 # Ollama client
-ollama
+#ollama
 
 
 

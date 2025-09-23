@@ -1,6 +1,6 @@
 from services.search import search_documents
 from .state import ChatbotState
-from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_tavily import TavilySearch
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -57,7 +57,7 @@ def RAG_search(state: ChatbotState):
 def web_Search(state: ChatbotState):
     
     #print("inside web search tool")
-    search_tool = TavilySearchResults(
+    search_tool = TavilySearch(
         api_key = os.getenv("TAVILY_API_KEY"),
         max_results = state.top_k_search,
         include_raw_content= True
@@ -96,11 +96,11 @@ def web_Search(state: ChatbotState):
     
     # pass reformatted prompt to tavily
     search_result = search_tool.invoke({'query' : rephrased_query})
-    
+    print(search_result)
     # get result from tavily in a strcutured way to save in state
     formatted_web_search_results = [
         {"url": doc["url"], "content": doc["content"]}
-        for doc in search_result
+        for doc in search_result['results']
     ]
 
     return {"web_search_results": formatted_web_search_results}
