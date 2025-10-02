@@ -5,12 +5,11 @@ pydantic-settings>=2.0.0
 python-dotenv
 sqlalchemy
 alembic
-psycopg2-binary
-passlib[bcrypt]
-passlib
+psycopg[binary, pool]
+asyncpg
+bcrypt
 jwt
 python-jose[cryptography]
-markdown-it
 
 # Milvus client
 pymilvus==2.4.0
@@ -32,6 +31,7 @@ apscheduler
 langchain
 #langchain-community
 langgraph
+langgraph-checkpoint-postgres
 langchain-tavily
 langchain-ollama   # integration layer for Ollama
 langchain-groq     # integration layer for Groq API
