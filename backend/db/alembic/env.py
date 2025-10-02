@@ -44,7 +44,7 @@ DB_HOST = os.getenv("POSTGRES_HOST", "db")  # default to "db" (Docker service na
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 
 if all([DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME]):
-    SQLALCHEMY_DATABASE_URL = f"postgresql://{encoded_user}:{encoded_password}@{DB_HOST}:{DB_PORT}/{encoded_name}"
+    SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg://{encoded_user}:{encoded_password}@{DB_HOST}:{DB_PORT}/{encoded_name}"
 else:
     print("Warning: Database credentials not found in environment variables. Using default alembic.ini values.")
 
