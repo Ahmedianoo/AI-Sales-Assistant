@@ -1,8 +1,48 @@
 from langgraph.graph import StateGraph, END, START
 from .state import ChatbotState
 from .nodes import check_for_reports_or_battlecards, web_Search, RAG_search, generate_answer
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from db import ASYNC_DATABASE_URL
 
-def build_chatbot_graph(state_schema: type):
+# --- SYNCHRONOUS PLACEHOLDERS ---
+# The synchronous code will just set placeholders.
+#global_checkpointer = None
+#compiled_graph = None 
+
+async def initialize_and_compile_graph():
+    """
+    Function to be called ONCE at application startup.
+    Initializes the checkpointer and then compiles the graph.
+    """
+    # global global_checkpointer
+    # global compiled_graph # We need to update this global variable
+
+    # if global_checkpointer is not None:
+    #     print("Checkpointer already initialized.")
+    #     return
+
+    # print("Creating persistent checkpointer instance...")
+    
+    # # 1. Initialize Checkpointer
+    # try:
+    #     context_manager = AsyncPostgresSaver.from_conn_string(ASYNC_DATABASE_URL)
+    #     # Note: We must save the context manager to properly close the pool later on shutdown
+    #     global_checkpointer = await context_manager.__aenter__() 
+    # except Exception as e:
+    #     print(f"CRITICAL ERROR: Failed to init checkpointer: {e}", flush=True)
+    #     return None
+    
+    # 2. Compile Graph (NOW that the checkpointer is ready)
+    try:
+        compiled_graph = build_chatbot_graph(ChatbotState, checkpointer=None)
+        print("Chatbot graph successfully compiled.", compiled_graph, flush=True)
+        return compiled_graph
+    except Exception as e:
+        print(f"CRITICAL ERROR: Failed to compile graph: {e}", flush=True)
+        return None
+
+
+def build_chatbot_graph(state_schema: type, checkpointer):
     
     graph = StateGraph(state_schema)
 
@@ -42,6 +82,8 @@ def build_chatbot_graph(state_schema: type):
     # 7. Set the entry point
     graph.set_entry_point("check_query")
 
-    built_graph = graph.compile()
+    built_graph = graph.compile(
+        checkpointer = checkpointer
+    )
 
     return built_graph

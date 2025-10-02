@@ -37,7 +37,7 @@ def get_db():
 # This will hold the persistent, active checkpointer instance.
 global_checkpointer: AsyncPostgresSaver | None = None
 
-async def check_connection():
+async def check_async_connection():
     print(f"DEBUG: Attempting to connect with URL: {ASYNC_DATABASE_URL}")
     try:
         # Use asyncpg's connection method directly
@@ -69,23 +69,3 @@ async def init_db():
         # Re-raise to halt application startup if the persistence layer fails
         raise
 
-async def initialize_global_checkpointer():
-    """
-    Function to be called ONCE at application startup, after init_db().
-    It creates and stores the persistent checkpointer instance for the graph to use.
-    """
-    global global_checkpointer
-
-    if global_checkpointer is not None:
-        print("Checkpointer already initialized.")
-        return
-
-    print("Creating persistent checkpointer instance...")
-    # This retrieves the actual usable AsyncPostgresSaver instance, not just the context manager object.
-    context_manager = AsyncPostgresSaver.from_conn_string(ASYNC_DATABASE_URL)
-    global_checkpointer = await context_manager.__aenter__() 
-    
-    # NOTE: You MUST ensure 'await global_checkpointer.__aexit__(None, None, None)' 
-    # is called on application shutdown to close the connection pool cleanly.
-    
-    print("Persistent checkpointer instance is ready.")

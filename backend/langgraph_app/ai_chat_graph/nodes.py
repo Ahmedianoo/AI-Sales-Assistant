@@ -18,23 +18,25 @@ groq_llm = ChatGroq(
 
 
 gemini_llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash", 
+    model="gemini-2.5-flash-lite", 
     temperature=0,
     google_api_key= os.getenv("GEMINI_API_KEY")
 )
 
 # node 1: decides if static response for generation of reports/ battlecards
-def check_for_reports_or_battlecards(state: ChatbotState):
+async def check_for_reports_or_battlecards(state: ChatbotState):
     query = state.query
 
     System = "You are a simple agent whose task is to determine if the input user query wants to generate" \
     "or display a 'report' or 'battlecard'. If it does, respond with 'REPORTS_BATTLECARDS_QUERY', else " \
     "respond with 'OTHER_QUERY'. "
     
-    decision = groq_llm.invoke([
+    decision_obj = await groq_llm.ainvoke([
         SystemMessage(content=System),
         HumanMessage(content=query)
-    ]).content
+    ])
+    
+    decision = decision_obj.content
 
     if "REPORTS_BATTLECARDS_QUERY" in decision:
         response = "I can't create those for you, but you can find them on the Reports and Battlecards pages."
@@ -54,7 +56,7 @@ def RAG_search(state: ChatbotState):
     return {"rag_results": results, "should_end": False}
 
 # node 3: search for results on web
-def web_Search(state: ChatbotState):
+async def web_Search(state: ChatbotState):
     
     #print("inside web search tool")
     search_tool = TavilySearch(
@@ -91,12 +93,12 @@ def web_Search(state: ChatbotState):
     
     prompt = ChatPromptTemplate.from_template(prompt_template)
     chain = prompt | groq_llm | StrOutputParser()
-    rephrased_query = chain.invoke({"query": state.query})
+    rephrased_query = await chain.ainvoke({"query": state.query})
     print("rephrased chatbot query: ", rephrased_query)
     
     # pass reformatted prompt to tavily
-    search_result = search_tool.invoke({'query' : rephrased_query})
-    print(search_result)
+    search_result = await search_tool.ainvoke({'query' : rephrased_query})
+    #print(search_result)
     # get result from tavily in a strcutured way to save in state
     formatted_web_search_results = [
         {"url": doc["url"], "content": doc["content"]}
@@ -106,7 +108,7 @@ def web_Search(state: ChatbotState):
     return {"web_search_results": formatted_web_search_results}
 
 # node 4: use both node 2 & 3 results to write final answer
-def generate_answer(state: ChatbotState):
+async def generate_answer(state: ChatbotState):
     """
     Synthesizes information from RAG and web search results to create a final,
     well-structured answer for the user, including a list of source URLs.
@@ -160,7 +162,7 @@ def generate_answer(state: ChatbotState):
     ]
     
     # Invoke the LLM
-    response = gemini_llm.invoke(final_prompt)
+    response = await gemini_llm.ainvoke(final_prompt)
     
     # Add the final answer to state
     state.final_response = response.content
