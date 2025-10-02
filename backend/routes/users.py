@@ -5,7 +5,7 @@ from typing import List, Optional, Any
 import datetime
 from models.users import User
 from db import get_db 
-from passlib.context import CryptContext
+import bcrypt
 import datetime
 from utils.token.createToken import create_access_token
 from middleware.isAuthenticated import get_current_user
@@ -62,10 +62,17 @@ class AuthResponse(BaseModel):
     token: str
     user: UserOut
 
-#pass hash
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def hash_password(password: str) -> str:
+    """Hash a password using bcrypt"""
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
+def verify_password(plain_password: str, hashed: str) -> bool:
+    """Verify a password against its hash"""
+    return bcrypt.checkpw(
+        plain_password.encode("utf-8"),
+        hashed.encode("utf-8"),
+    )
 
 #signup
 @router.post("/signup", response_model=AuthResponse)
@@ -77,7 +84,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     
-    hashed_password = pwd_context.hash(user.password)
+    hashed_password = hash_password(user.password)
     new_user = User(
         name=user.name,
         email=user.email,
@@ -114,7 +121,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 def login_user(login_data: LoginRequest, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.email == login_data.email).first()
-        if not user or not pwd_context.verify(login_data.password, user.password_hash):
+        if not user or not verify_password(login_data.password, user.password_hash):
             raise HTTPException(status_code=400, detail="Invalid email or password")
 
         token = create_access_token({"user_id": user.user_id})
