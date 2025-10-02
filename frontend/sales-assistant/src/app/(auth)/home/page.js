@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Menu, Send, Plus, UserIcon, BotIcon } from "lucide-react"
 import styles from './home.module.css'
-import { fetchSearchHistory, saveSearchQuery } from "@/app/actions/searchHistory"
+import { fetchConversations} from "@/app/actions/searchHistory"
 import { call_to_chatbot } from "@/app/actions/chatbot"
 
 export default function Home() {
@@ -11,28 +11,46 @@ export default function Home() {
   const [inputValue, setInputValue] = useState("")
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [chatHistory, setChatHistory] = useState([])
-  const [currentChatId, setCurrentChatId] = useState(null)
-  const [currentChatSaved, setCurrentChatSaved] = useState(false)
-  const [isLoading, setIsLoading] = useState(false) // Added loading state
+  const [currentChatId, setCurrentChatId] = useState(null) 
+  const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef(null)
   const textareaRef = useRef(null)
 
+  // Function to initialize a new conversation thread with a UUID
+  const startNewThread = () => {
+    const newThreadId = crypto.randomUUID()
+    setMessages([])
+    setCurrentChatId(newThreadId)
+    console.log("New thread started with ID:", newThreadId)
+  }
+
+  // Effect 1: Load history for sidebar and initialize a new thread if none exists
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const data = await fetchSearchHistory()
-        setChatHistory(data)
-      } catch (err) {
-        console.error("Error loading search history:", err)
+        const data = await fetchConversations()
+        setChatHistory(data) // data.{id, title}
+        
+        // If history is empty and no current chat is active, start a new thread
+        if (data.length === 0 && currentChatId === null) {
+          startNewThread()
+        }
+      } catch (err) {      
+        // Fallback: If history fails to load, ensure a new thread starts
+        if (currentChatId === null) {
+           startNewThread()
+        }
       }
     }
     loadHistory()
-  }, [])
+  }, []) // Dependency array ensures this runs once on mount
 
+  //Effect 2: autoscroll of messages in main chat panel
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
+  //Effect 3: expand input text area for larger queries
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto"
@@ -41,9 +59,18 @@ export default function Home() {
     }
   }, [inputValue])
 
+  //Effect 4: 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return
+    // Check 1: Message content and loading state
+    if (!inputValue.trim() || isLoading) return;
 
+    // Check 2: Thread ID MUST be set. If not, set it NOW and use the new ID immediately.
+    let threadIdToSend = currentChatId;
+    if (currentChatId === null) {
+        threadIdToSend = crypto.randomUUID();
+        setCurrentChatId(threadIdToSend); 
+    }
+    
     const newMessage = {
       id: Date.now(),
       text: inputValue,
@@ -51,24 +78,12 @@ export default function Home() {
       timestamp: new Date(),
     }
 
-    let backendData = null
-    if (!currentChatSaved) {
-      try {
-        backendData = await saveSearchQuery(inputValue)
-      } catch (err) {
-        console.error("Error saving search query:", err)
-      }
-    }
-
-    if (messages.length === 0 && !currentChatSaved) {
+    if (messages.length === 0) {
       const newChat = {
-        id: backendData ? backendData.search_id : Date.now(),
+        id: threadIdToSend, 
         title: inputValue.slice(0, 50) + (inputValue.length > 50 ? "..." : ""),
-        messages: [],
       }
       setChatHistory((prev) => [newChat, ...prev])
-      setCurrentChatId(newChat.id)
-      setCurrentChatSaved(true)
     }
 
     setMessages((prev) => [...prev, newMessage])
@@ -76,9 +91,9 @@ export default function Home() {
     setIsLoading(true) // start loading for AI response
 
     try {
-      // Call the separate function to post the message and get the AI's response
-      console.log("Sending message to backend: ", newMessage.text)
-      const aiResponseText = await call_to_chatbot(newMessage.text);
+      // Pass the thread ID to the backend for LangGraph persistence
+      console.log(`Sending message to backend for thread ID ${threadIdToSend}: ${newMessage.text}`)
+      const aiResponseText = await call_to_chatbot({query: newMessage.text, thread_id:threadIdToSend});
 
       // Add the AI's response to the chat
       const newAIResponse = {
@@ -109,20 +124,21 @@ export default function Home() {
     }
   }
 
-  const handleChatSelect = (chat) => {
+  //FIX!!!! no more chat.messages
+  const handleChatSelect = async(chat) => {
+    setCurrentChatId(chat.id) // This is now the thread_id for persistence
+    //load messages from backend (pass thread_id to backend)
+    //const loaded_mssgs = await get_conversation_messages({currentChatId});
+    
+    //update sort so it works
     const sortedMessages = [...chat.messages].sort(
       (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
     )
     setMessages(sortedMessages)
-    setCurrentChatId(chat.id)
-    setCurrentChatSaved(true)
   }
 
-  const handleNewChat = () => {
-    setMessages([])
-    setCurrentChatId(null)
-    setCurrentChatSaved(false)
-  }
+  // Use the new thread function to reset the UI and generate a new UUID
+  const handleNewChat = startNewThread
 
   const formatTime = (timestamp) => {
     const date = new Date(timestamp)
@@ -145,7 +161,7 @@ export default function Home() {
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleNewChat()
+                  handleNewChat() //starts a new thread
                 }}
                 className={styles.btn}
               >
