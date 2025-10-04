@@ -4,10 +4,8 @@ from sqlalchemy import create_engine
 from dotenv import load_dotenv
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
-from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-
-import asyncpg # Make sure this is imported
-from contextlib import suppress
+from psycopg_pool import AsyncConnectionPool
+import asyncpg
 
 # Load .env file
 load_dotenv()
@@ -34,8 +32,9 @@ def get_db():
     finally:
         db.close()
 
-# This will hold the persistent, active checkpointer instance.
-global_checkpointer: AsyncPostgresSaver | None = None
+# Create an async pool (but don't open yet — will open in lifespan)
+async_pool = AsyncConnectionPool(conninfo=ASYNC_DATABASE_URL, max_size=10, open=False)
+
 
 async def check_async_connection():
     print(f"DEBUG: Attempting to connect with URL: {ASYNC_DATABASE_URL}")

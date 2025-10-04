@@ -10,8 +10,8 @@ from models.competitors import Competitor
 from langgraph_app.ai_chat_graph.nodes import web_Search
 from langgraph_app.ai_chat_graph.state import ChatbotState
 from uuid import UUID
+from langgraph_app.ai_chat_graph.graphs import build_chatbot_graph
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from db import ASYNC_DATABASE_URL
 
 router = APIRouter(prefix="/ai_chat", tags=["ai_chat"])
 
@@ -45,6 +45,7 @@ async def call_chatbot_graph(
     fastapi_request: Request, 
     user: User = Depends(get_current_user), 
     db: Session = Depends(get_db)):
+
     print("post endpoint for user query hit")
 
     # Query to select the Conversation where the thread_id AND user_id match
@@ -94,14 +95,13 @@ async def call_chatbot_graph(
         }
     }
 
-    cg = fastapi_request.app.state.compiled_graph
-    if cg is None:
-        raise RuntimeError("Graph not initialized; in endpoint")
-    
-    # Create fresh checkpointer per request
-    async with AsyncPostgresSaver.from_conn_string(ASYNC_DATABASE_URL) as checkpointer:
-        # state_to_send and config remain the same
-        llm_ans = await cg.ainvoke(state_to_send, config, checkpointer=checkpointer)
+    async_pool = getattr(fastapi_request.app.state, "async_pool", None)
+    chatbot_graph = getattr(fastapi_request.app.state, "chatbot_graph", None)
+    saver = getattr(fastapi_request.app.state, "saver", None)
+
+    # async with async_pool.connection() as conn:
+    #     saver = AsyncPostgresSaver(conn)  # single connection per session    
+    llm_ans = await chatbot_graph.ainvoke(state_to_send, config, checkpointer=saver)
     
     return {"response": llm_ans['final_response']}
 

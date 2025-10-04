@@ -6,13 +6,39 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 from APScheduler.scheduler import start_scheduler
-from db import init_db, check_async_connection
-from langgraph_app.ai_chat_graph.graphs import initialize_and_compile_graph
+from db import ASYNC_DATABASE_URL, async_pool
+from langgraph_app.ai_chat_graph.graphs import build_chatbot_graph
+from langgraph_app.ai_chat_graph.state import ChatbotState
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from contextlib import asynccontextmanager
 
 load_dotenv()
 frontendUrl = os.getenv("frontendURL")
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # --- Startup ---
+    start_scheduler()
+    app.state.async_pool =  async_pool
+    await async_pool.open()
+
+    async with async_pool.connection() as conn:
+        saver = AsyncPostgresSaver(conn)
+        #await saver.setup()
+
+    # Attach it globally
+    app.state.saver = saver
+
+    chatbot_graph = build_chatbot_graph(ChatbotState, None)
+    app.state.chatbot_graph = chatbot_graph
+
+    yield  # --- App runs ---
+
+    # --- Shutdown ---
+    await async_pool.close()
+
+app = FastAPI(lifespan=lifespan)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,24 +47,6 @@ app.add_middleware(
     allow_methods=["*"],  
     allow_headers=["*"],  
 )
-
-@app.on_event("startup")
-async def startup_event():
-#    print("called scheduler in main", flush=True)
-    start_scheduler()
-
-    #await check_async_connection()
-
-    # IMPORTANT!! Run only once then MUST be commented out
-    #await init_db()
-    graph = await initialize_and_compile_graph()
-    app.state.compiled_graph = graph
-    #app.state.checkpointer_cm = context_manager
-
-
-# @app.on_event("shutdown")
-# async def shutdown_event():
-#     await app.state.checkpointer_cm.__aexit__(None, None, None)
 
 app.include_router(battlecards.router)
 app.include_router(users.router)
@@ -50,15 +58,5 @@ app.include_router(crawl.router)
 app.include_router(ai_chat.router)
 
 @app.get("/")
-
 def root():
-    return {"message": "Sales Assistant API is running"}
-    
-
-    
-
-
-
-# @app.get("/")
-# def temp():
-#     print("hello hello")    
+    return {"message": "Sales Assistant API is running"}   
