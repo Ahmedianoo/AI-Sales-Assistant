@@ -398,10 +398,9 @@ export default function Home() {
     setIsLoading(true)
 
     try {
-      console.log(`Sending message for thread ${threadIdToSend}:`, newMessage.text)
       const aiResponseText = await call_to_chatbot({
         query: newMessage.text,
-        thread_id: threadIdToSend,
+        thread_id: currentChatId,
       })
 
       const newAIResponse = {

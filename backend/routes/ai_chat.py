@@ -12,6 +12,8 @@ from langgraph_app.ai_chat_graph.state import ChatbotState
 from uuid import UUID
 from langgraph_app.ai_chat_graph.graphs import build_chatbot_graph
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from langchain_core.messages import HumanMessage
+from datetime import datetime, timezone
 
 router = APIRouter(prefix="/ai_chat", tags=["ai_chat"])
 
@@ -43,7 +45,7 @@ class QueryRequest(BaseModel):
 async def call_chatbot_graph(
     request: QueryRequest,
     fastapi_request: Request, 
-    user: User = Depends(get_current_user), 
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db)):
 
     print("post endpoint for user query hit")
@@ -59,6 +61,7 @@ async def call_chatbot_graph(
         )
     )
     conversation = db.execute(stmt).scalars().first()
+    print("conversation for searched query based on thread_id: ", conversation)
 
     #if thread_id passed is not in conversations for the specific user 
     # --> add to db and invoke graph with init_sate        
@@ -74,20 +77,31 @@ async def call_chatbot_graph(
         db.commit()
         db.refresh(new_conversation)
 
-        competitor_ids_list = []
-        for uc in user.user_competitors:
-            competitor_ids_list.append(uc.competitor.competitor_id)
-        
-        init_state = ChatbotState(
-            query= request.query,  
-            user_id= user.user_id,
-            competitor_ids= competitor_ids_list,
-        )
+    competitor_ids_list = []
+    for uc in user.user_competitors:
+        competitor_ids_list.append(uc.competitor.competitor_id)
+    
+    # init_state = ChatbotState(
+    #     query= request.query,  
+    #     user_id= user.user_id,
+    #     competitor_ids= competitor_ids_list,
+    #     messages = [HumanMessage(content=request.query)] 
+    # )
 
-        state_to_send = init_state
-    #else if thread_id already found --> no db updates and invoke graph with message only
-    else:
-        state_to_send = {"query": request.query}
+    state_to_send = {
+        # REQUIRED FIELDS
+        "query": request.query,  
+        "user_id": user.user_id,
+        "competitor_ids": competitor_ids_list,
+        "messages": [HumanMessage(content=request.query, additional_kwargs={"timestamp": datetime.now(timezone.utc).isoformat()})],
+            # ✅ FIX: Explicitly add all defaulted fields defined in ChatbotState
+        "rag_results": None,
+        "web_search_results": None,
+        "top_k_rag": 3,           # <-- Add these back
+        "top_k_search": 1,        # <-- This was missing and caused the KeyError
+        "final_response": "",
+        "should_end": False,
+    }
 
     config = {
         "configurable": {
@@ -96,12 +110,13 @@ async def call_chatbot_graph(
     }
 
     async_pool = getattr(fastapi_request.app.state, "async_pool", None)
-    chatbot_graph = getattr(fastapi_request.app.state, "chatbot_graph", None)
-    saver = getattr(fastapi_request.app.state, "saver", None)
+    #chatbot_graph = getattr(fastapi_request.app.state, "chatbot_graph", None)
+    #saver = getattr(fastapi_request.app.state, "saver", None)
 
-    # async with async_pool.connection() as conn:
-    #     saver = AsyncPostgresSaver(conn)  # single connection per session    
-    llm_ans = await chatbot_graph.ainvoke(state_to_send, config, checkpointer=saver)
+    async with async_pool.connection() as conn:
+        saver = AsyncPostgresSaver(conn)  # single connection per session   
+        chatbot_graph = build_chatbot_graph(ChatbotState, saver)    
+        llm_ans = await chatbot_graph.ainvoke(state_to_send, config=config, checkpointer=saver)    
     
     return {"response": llm_ans['final_response']}
 

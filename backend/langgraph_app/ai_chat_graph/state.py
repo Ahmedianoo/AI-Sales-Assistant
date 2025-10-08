@@ -1,8 +1,12 @@
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, TypedDict, Annotated
 from pydantic import BaseModel
+from typing_extensions import TypedDict
+from langchain_core.messages import BaseMessage # Import BaseMessage
+from langgraph.graph.message import add_messages # Import the reducer
 from services.schemas import SearchResult
 
-class ChatbotState(BaseModel):
+class ChatbotState(TypedDict):
+    messages: Annotated[List[BaseMessage], add_messages]
     query: str = ""
     user_id: int = None
     competitor_ids: Optional[List[int]] = None

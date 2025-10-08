@@ -22,15 +22,15 @@ async def lifespan(app: FastAPI):
     app.state.async_pool =  async_pool
     await async_pool.open()
 
-    async with async_pool.connection() as conn:
-        saver = AsyncPostgresSaver(conn)
-        #await saver.setup()
+    # async with async_pool.connection() as conn:
+    #     saver = AsyncPostgresSaver(conn)
+    #     #await saver.setup()
+    #saver = AsyncPostgresSaver(app.state.async_pool)
+    
+    #app.state.saver = saver
 
-    # Attach it globally
-    app.state.saver = saver
-
-    chatbot_graph = build_chatbot_graph(ChatbotState, None)
-    app.state.chatbot_graph = chatbot_graph
+    #chatbot_graph = build_chatbot_graph(ChatbotState, None)
+    #app.state.chatbot_graph = chatbot_graph
 
     yield  # --- App runs ---
 

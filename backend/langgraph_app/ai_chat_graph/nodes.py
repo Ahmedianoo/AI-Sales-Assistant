@@ -1,12 +1,13 @@
 from services.search import search_documents
 from .state import ChatbotState
 from langchain_tavily import TavilySearch
-from langchain.schema import SystemMessage, HumanMessage
+from langchain_core.messages import AIMessage, SystemMessage, HumanMessage
 from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import os
+from datetime import datetime, timezone
 
 #BismAllah
 
@@ -23,9 +24,12 @@ gemini_llm = ChatGoogleGenerativeAI(
     google_api_key= os.getenv("GEMINI_API_KEY")
 )
 
+async def tmp1(state:ChatbotState):
+        return {"final_response":"node1 answer", "messages": [AIMessage(content="node1 answer", additional_kwargs={"timestamp": datetime.now(timezone.utc).isoformat()})], "should_end":True}
+
 # node 1: decides if static response for generation of reports/ battlecards
 async def check_for_reports_or_battlecards(state: ChatbotState):
-    query = state.query
+    query = state["query"]
 
     System = "You are a simple agent whose task is to determine if the input user query wants to generate" \
     "or display a 'report' or 'battlecard'. If it does, respond with 'REPORTS_BATTLECARDS_QUERY', else " \
@@ -42,7 +46,7 @@ async def check_for_reports_or_battlecards(state: ChatbotState):
         response = "I can't create those for you, but you can find them on the Reports and Battlecards pages."
         "Just let me know if you need anything else!"
 
-        return {"final_response":response, "should_end":True}
+        return {"final_response":response, "messages": [AIMessage(content=response, additional_kwargs={"timestamp": datetime.now(timezone.utc).isoformat()})], "should_end":True}
     else:
         return{"should_end":False}
     
@@ -50,8 +54,8 @@ async def check_for_reports_or_battlecards(state: ChatbotState):
 # node 2: search for results in RAG
 def RAG_search(state: ChatbotState):
 
-    query = state.query
-    results = search_documents(user_id=state.user_id, competitor_ids=state.competitor_ids, query=query, top_k=state.top_k_rag)
+    query = state["query"]
+    results = search_documents(user_id=state["user_id"], competitor_ids=state["competitor_ids"], query=query, top_k=state["top_k_rag"])
 
     return {"rag_results": results, "should_end": False}
 
@@ -61,7 +65,7 @@ async def web_Search(state: ChatbotState):
     #print("inside web search tool")
     search_tool = TavilySearch(
         api_key = os.getenv("TAVILY_API_KEY"),
-        max_results = state.top_k_search,
+        max_results = state["top_k_search"],
         include_raw_content= True
     )
     
@@ -93,7 +97,7 @@ async def web_Search(state: ChatbotState):
     
     prompt = ChatPromptTemplate.from_template(prompt_template)
     chain = prompt | groq_llm | StrOutputParser()
-    rephrased_query = await chain.ainvoke({"query": state.query})
+    rephrased_query = await chain.ainvoke({"query": state["query"]})
     print("rephrased chatbot query: ", rephrased_query)
     
     # pass reformatted prompt to tavily
@@ -113,9 +117,10 @@ async def generate_answer(state: ChatbotState):
     Synthesizes information from RAG and web search results to create a final,
     well-structured answer for the user, including a list of source URLs.
     """
-    question = state.query
-    rag_results = state.rag_results
-    web_search_results = state.web_search_results
+    question = state["query"]
+    rag_results = state["rag_results"]
+    web_search_results = state["web_search_results"]
+    history = state["messages"] 
 
     # Structure the inputs for the LLM
     structured_context = ""
@@ -151,21 +156,27 @@ async def generate_answer(state: ChatbotState):
     2.  **Proper Formatting**: Structure your response using short paragraphs and bullet points to enhance readability.
     3.  **Clarity**: Ensure the final answer is clear, concise, and directly addresses the user's question.
     4.  **No Hallucination**: Do not include any information that is not supported by the provided context. If the context does not contain enough information to answer the question, state that clearly and concisely.
-    5.  **Citations**: If you use any information from the web search results, you **must** include a "Resources" section at the end of your answer. List the full URLs of the sources you used in a bulleted list.
+    5.  **Citations**: If you use any information from the web search results, you **must** include a "Resources" section at the end of your answer. List the most relevant 5 URLs of the sources you used in a bulleted list.
     6.  **Politeness**: Start your response with a brief, friendly acknowledgment that you have found the requested information.
     """
+
+    context_message_content = (
+        f"--- CONTEXT ---\n{structured_context}\n\n"
+        f"--- USER'S QUESTION (for synthesis) ---\n{question}"
+    )
 
     # Combine the system and human messages
     final_prompt = [
         SystemMessage(content=system_prompt),
-        HumanMessage(content=f"--- CONTEXT ---\n{structured_context}\n\n--- USER'S QUESTION ---\n{question}")
+        SystemMessage(content=context_message_content),
+        *history
     ]
     
     # Invoke the LLM
     response = await gemini_llm.ainvoke(final_prompt)
     
     # Add the final answer to state
-    state.final_response = response.content
-    state.should_end = True
-
-    return state
+    # state["final_response"] = response.content
+    # state["should_end"] = True
+    # state["messages"] = [AIMessage(content=response.content)]
+    return  {"final_response":response.content, "messages": [AIMessage(content=response.content, additional_kwargs={"timestamp": datetime.now(timezone.utc).isoformat()})], "should_end":True}
