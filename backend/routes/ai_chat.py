@@ -78,9 +78,11 @@ async def call_chatbot_graph(
         db.refresh(new_conversation)
 
     competitor_ids_list = []
+    competitor_names_list = []
     for uc in user.user_competitors:
         competitor_ids_list.append(uc.competitor.competitor_id)
-    
+        competitor_names_list.append(uc.competitor.name)
+
     # init_state = ChatbotState(
     #     query= request.query,  
     #     user_id= user.user_id,
@@ -93,6 +95,7 @@ async def call_chatbot_graph(
         "query": request.query,  
         "user_id": user.user_id,
         "competitor_ids": competitor_ids_list,
+        "compeitor_names" : competitor_names_list,
         "messages": [HumanMessage(content=request.query, additional_kwargs={"timestamp": datetime.now(timezone.utc).isoformat()})],
             # ✅ FIX: Explicitly add all defaulted fields defined in ChatbotState
         "rag_results": None,

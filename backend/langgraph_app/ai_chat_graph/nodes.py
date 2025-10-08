@@ -28,8 +28,8 @@ async def tmp1(state:ChatbotState):
         return {"final_response":"node1 answer", "messages": [AIMessage(content="node1 answer", additional_kwargs={"timestamp": datetime.now(timezone.utc).isoformat()})], "should_end":True}
 
 # node 1: decides if static response for generation of reports/ battlecards
-async def check_for_reports_or_battlecards(state: ChatbotState):
-    query = state["query"]
+async def init_router(state: ChatbotState):
+    history =  state["messages"]
 
     System = "You are a simple agent whose task is to determine if the input user query wants to generate" \
     "or display a 'report' or 'battlecard'. If it does, respond with 'REPORTS_BATTLECARDS_QUERY', else " \
@@ -37,10 +37,10 @@ async def check_for_reports_or_battlecards(state: ChatbotState):
     
     decision_obj = await groq_llm.ainvoke([
         SystemMessage(content=System),
-        HumanMessage(content=query)
+        *history
     ])
     
-    decision = decision_obj.content
+    decision = decision_obj.content.strip().upper() # Clean up the output
 
     if "REPORTS_BATTLECARDS_QUERY" in decision:
         response = "I can't create those for you, but you can find them on the Reports and Battlecards pages."
@@ -70,7 +70,9 @@ async def web_Search(state: ChatbotState):
     )
     
     # reformat user input queries into stronger, better prompts for searching
-    prompt_template = """You are a sales assistant whose sole purpose is to rephrase a user's natural language query into a concise and effective search query for a web search engine. 
+    prompt_template = """You are a simple ai assistant whose sole purpose is to rephrase the latest user query, 
+    using the provided conversation history for context, into a concise and effective search query for a web search engine. 
+
     Your output must be a single, optimized search query and nothing else.
         Guidelines:
         - **Be Concise:** The query should be as short as possible while retaining all necessary information.
@@ -95,13 +97,18 @@ async def web_Search(state: ChatbotState):
         Rewritten query:
         """
     
-    prompt = ChatPromptTemplate.from_template(prompt_template)
-    chain = prompt | groq_llm | StrOutputParser()
-    rephrased_query = await chain.ainvoke({"query": state["query"]})
-    print("rephrased chatbot query: ", rephrased_query)
+    history = state["messages"] 
+    final_prompt = [
+        SystemMessage(content = prompt_template),
+        *history
+    ]
+
+    rephrased_query = await groq_llm.ainvoke(final_prompt)
+    rephrased_query_str = rephrased_query.content
+    print("rephrased chatbot query: ", rephrased_query_str)
     
     # pass reformatted prompt to tavily
-    search_result = await search_tool.ainvoke({'query' : rephrased_query})
+    search_result = await search_tool.ainvoke({'query' : rephrased_query_str})
     #print(search_result)
     # get result from tavily in a strcutured way to save in state
     formatted_web_search_results = [

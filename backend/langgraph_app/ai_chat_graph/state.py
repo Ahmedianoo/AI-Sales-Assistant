@@ -10,6 +10,7 @@ class ChatbotState(TypedDict):
     query: str = ""
     user_id: int = None
     competitor_ids: Optional[List[int]] = None
+    competitors_names: Optional[List[str]] = None
     rag_results: Optional[List[SearchResult]] = None
     web_search_results: Optional[List[Dict]] =None
     top_k_rag: int = 3
