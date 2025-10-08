@@ -22,7 +22,7 @@ groq_llm = ChatGroq(
 
 
 gemini_llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash",  # or "gemini-1.5-pro" if you need deeper reasoning
+    model="gemini-2.5-flash",  # or "gemini-1.5-pro" if you need deeper reasoning
     temperature=0,
     google_api_key=gemini_api_key
 )
