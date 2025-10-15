@@ -67,7 +67,7 @@ If the user provides no query, generate a general competitor analysis query for 
 
 def search_web(state: BattlecardState):
 
-    structured_llm = groq_llm.with_structured_output(SearchQuery)
+    structured_llm = gemini_llm.with_structured_output(SearchQuery)
 
     messages = [search_instructions]
     if state.query:
