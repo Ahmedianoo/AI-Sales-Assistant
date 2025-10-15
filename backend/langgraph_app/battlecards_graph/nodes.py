@@ -1,8 +1,8 @@
 from services.search import search_documents
 from .state import BattlecardState
-from langchain_community.tools.tavily_search import TavilySearchResults
 from pydantic import BaseModel, Field
 from typing import Dict, List
+from langchain_tavily import TavilySearch
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -77,14 +77,14 @@ def search_web(state: BattlecardState):
 
     print("SEARCH QUERY:", search_query.search_query)
 
-    tavily_search = TavilySearchResults(max_results=5, api_key=os.getenv("TAVILY_API_KEY"))
+    tavily_search = TavilySearch(max_results=5, api_key=os.getenv("TAVILY_API_KEY"))
     search_docs = tavily_search.invoke(search_query.search_query)
 
     
 
     formatted_web_search_results = [
         {"url": doc["url"], "content": doc["content"]}
-        for doc in search_docs
+        for doc in search_docs['results']
     ]
 
     state.web_search_results = formatted_web_search_results    
