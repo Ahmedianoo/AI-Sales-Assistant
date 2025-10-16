@@ -39,4 +39,7 @@ def process_and_ingest(competitor_id: int, text: str, chunk_size: int = 500):
         db.close()
 
 
+        
+
+
 

@@ -32,6 +32,16 @@ langchain
 langchain-community
 langgraph
 langchain-ollama   # integration layer for Ollama
+langchain-groq     # integration layer for Groq API
+langchain-google-genai  # integration layer for Gemini API
 
 # Ollama client
 ollama
+
+
+
+
+
+
+
+

@@ -76,10 +76,11 @@ export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="max-w-6xl w-full h-[85vh] overflow-y-auto rounded-3xl border 
-        border-[var(--accent-color)]/50 shadow-2xl p-10 
-        bg-[var(--primary-bg)]/95"
-      >
+              className="!max-w-[90vw] w-full h-[85vh] overflow-y-auto rounded-3xl border 
+              border-[var(--accent-color)]/50 shadow-2xl p-10 
+              bg-[var(--primary-bg)]/95"
+
+              >
         <DialogHeader className="space-y-2">
           {editMode ? (
             <DialogTitle asChild>
@@ -115,7 +116,8 @@ export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate 
             ? Object.entries(draftContent).map(([tag, value], idx) => (
                 <motion.div
                   key={idx}
-                  className="flex flex-col gap-3 p-6 rounded-2xl border border-[var(--accent-color)]/40 bg-white/80 shadow-sm"
+                  className="sm:col-span-2 lg:col-span-1 p-6 rounded-2xl border border-[var(--accent-color)]/40 
+                     bg-white/80 shadow-sm flex flex-col gap-3"
                 >
                   <h3 className="text-xl font-semibold text-[var(--secondary-color)] font-[var(--font-family-sans)]">
                     {tag.toUpperCase()}
@@ -132,7 +134,8 @@ export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate 
             : Object.entries(content).map(([tag, value], idx) => (
                 <motion.div
                   key={idx}
-                  className="p-6 rounded-2xl border border-[var(--accent-color)]/40 bg-white/80 shadow-sm flex flex-col gap-3"
+                  className="sm:col-span-2 lg:col-span-1 p-6 rounded-2xl border border-[var(--accent-color)]/40 
+                     bg-white/80 shadow-sm flex flex-col gap-3"
                 >
                   <h3 className="text-xl font-semibold text-[var(--secondary-color)] font-[var(--font-family-sans)]">
                     {tag.toUpperCase()}

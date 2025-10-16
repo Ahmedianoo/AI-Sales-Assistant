@@ -11,9 +11,8 @@ class SearchResult(BaseModel):
     hit: Dict[str, Any]
     text: Optional[str]
 
-
-
 def search_documents(user_id: int, competitor_ids: List[int], query: str, top_k: int = 5) -> List[SearchResult]:
+    
     db = SessionLocal()
     try:
         if not competitor_ids:
