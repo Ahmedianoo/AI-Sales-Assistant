@@ -22,7 +22,7 @@ groq_llm = ChatGroq(
 
 
 gemini_llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash",  # or "gemini-1.5-pro" if you need deeper reasoning
+    model="gemini-2.5-flash",  # or "gemini-1.5-pro" if you need deeper reasoning
     temperature=0,
     google_api_key=gemini_api_key
 )
@@ -67,7 +67,7 @@ If the user provides no query, generate a general competitor analysis query for 
 
 def search_web(state: BattlecardState):
 
-    structured_llm = groq_llm.with_structured_output(SearchQuery)
+    structured_llm = gemini_llm.with_structured_output(SearchQuery)
 
     messages = [search_instructions]
     if state.query:

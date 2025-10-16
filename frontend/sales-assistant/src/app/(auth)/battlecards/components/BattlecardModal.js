@@ -11,6 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea"
+
 import { motion } from "framer-motion";
 import { updateBattlecard } from "../../../actions/battlecards";
 
@@ -122,12 +124,13 @@ export default function BattlecardModal({ isOpen, onClose, battlecard, onUpdate 
                   <h3 className="text-xl font-semibold text-[var(--secondary-color)] font-[var(--font-family-sans)]">
                     {tag.toUpperCase()}
                   </h3>
-                  <Input
+                  <Textarea
                     value={value}
                     onChange={(e) =>
                       setDraftContent({ ...draftContent, [tag]: e.target.value })
                     }
-                    className="bg-white/70 rounded-lg"
+                    className="w-full min-h-[150px] bg-white/70 rounded-lg px-4 py-3 text-lg leading-relaxed text-[var(--foreground)] font-[var(--font-family-sans)] resize-none focus-visible:ring-[var(--accent-color)] focus-visible:ring-2"
+                    placeholder={`Edit ${tag}...`}
                   />
                 </motion.div>
               ))
