@@ -46,11 +46,11 @@ async def crawl_and_ingest_single_url(crawler, competitor_id, url):
                 doc_id, num_chunks = process_and_ingest(competitor_id, doc.markdown)
                 print(f"Ingested {num_chunks} chunks for doc {doc_id} from {url}.")
                 
-                # Retrieve the newly created document and update the timestamp
-                raw_doc = db.query(RawDocument).filter(RawDocument.id == doc_id).first()
-                if raw_doc:
-                    raw_doc.scraped_at = datetime.datetime.now()
-                    db.commit()
+                # # Retrieve the newly created document and update the timestamp
+                # raw_doc = db.query(RawDocument).filter(RawDocument.id == doc_id).first()
+                # if raw_doc:
+                #     raw_doc.scraped_at = datetime.datetime.now()
+                #     db.commit()
 
     except Exception as e:
         db.rollback() # Rollback changes if an error occurs

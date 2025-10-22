@@ -2,11 +2,14 @@ from models import RawDocument, UserCompetitor
 from milvus.service import search
 from db import SessionLocal
 from typing import List 
-from .schemas import SearchResult
+from pydantic import BaseModel
+from typing import List, Dict, Any, Optional
+
 
  
-
-
+class SearchResult(BaseModel):
+    hit: Dict[str, Any]
+    text: Optional[str]
 
 def search_documents(user_id: int, competitor_ids: List[int], query: str, top_k: int = 5) -> List[SearchResult]:
     
