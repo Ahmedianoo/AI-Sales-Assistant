@@ -18,21 +18,21 @@ class CrawlResponse(BaseModel):
 
 
 @router.post("/crawl_competitor", response_model=CrawlResponse)
-async def crawl_competitor(req: CrawlRequest, background_tasks: BackgroundTasks = None):
-    
-
+async def crawl_competitor(req: CrawlRequest, background_tasks: BackgroundTasks):
     async with AsyncWebCrawler() as crawler:
-        results = await crawler.arun(req.url)  
+        results = await crawler.arun(req.url)
 
     scheduled = 0
-    for doc in results:   # results is iterable of CrawlResult
+    for doc in results:
         if doc.markdown:
             background_tasks.add_task(process_and_ingest, req.competitor_id, doc.markdown)
             scheduled += 1
 
-    return CrawlResponse(competitor_id=req.competitor_id, url=req.url, scheduled_docs=scheduled )   
-
-
+    return CrawlResponse(
+        competitor_id=req.competitor_id,
+        url=req.url,
+        scheduled_docs=scheduled
+    )
 
 
 

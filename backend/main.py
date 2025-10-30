@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import battlecards, milvus, ingest_search, crawl
+from routes import battlecards, milvus, ingest_search, crawl, reports, competitors
 from routes import users
 from routes import search_history
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,7 +32,8 @@ app.include_router(search_history.router)
 app.include_router(milvus.router)
 app.include_router(ingest_search.router)
 app.include_router(crawl.router)
-
+app.include_router(reports.router)
+app.include_router(competitors.router)
 
 
 @app.get("/")

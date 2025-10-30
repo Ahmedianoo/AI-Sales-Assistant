@@ -44,6 +44,9 @@ def search(
     if competitor_ids:
         expr = f"competitor_id in {competitor_ids}"
 
+    print("SEARCH expr:", expr)
+    print("Partition names:", [f"competitor_{cid}" for cid in competitor_ids] if competitor_ids else None)
+
     search_params = {"metric_type": settings.MILVUS_METRIC, "params": {"ef": 64}}
     results = coll.search(
         data=qvec,

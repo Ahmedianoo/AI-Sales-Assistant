@@ -43,3 +43,6 @@ ollama
 
 sentence-transformers
 
+langchain-google-genai
+
+beautifulsoup4
