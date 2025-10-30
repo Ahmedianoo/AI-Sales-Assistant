@@ -4,6 +4,6 @@ from .competitors import Competitor
 from .user_competitor import UserCompetitor
 from .reports import Report
 from .battlecards import Battlecard
-from .search_history import SearchHistory
+from .conversations import Conversation
 from .alerts import Alert
 from .raw_document import RawDocument

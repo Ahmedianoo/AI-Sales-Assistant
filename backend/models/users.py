@@ -19,8 +19,8 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan"
     )
-    search_history = relationship(
-        "SearchHistory",
+    conversations = relationship(
+        "Conversation",
         back_populates="user",
         cascade="all, delete-orphan"
     )

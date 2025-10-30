@@ -5,7 +5,7 @@ from typing import List, Optional, Any
 import datetime
 from models.users import User
 from db import get_db 
-from passlib.context import CryptContext
+import bcrypt
 import datetime
 from utils.token.createToken import create_access_token
 from middleware.isAuthenticated import get_current_user
@@ -62,10 +62,17 @@ class AuthResponse(BaseModel):
     token: str
     user: UserOut
 
-#pass hash
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def hash_password(password: str) -> str:
+    """Hash a password using bcrypt"""
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
+def verify_password(plain_password: str, hashed: str) -> bool:
+    """Verify a password against its hash"""
+    return bcrypt.checkpw(
+        plain_password.encode("utf-8"),
+        hashed.encode("utf-8"),
+    )
 
 #signup
 @router.post("/signup", response_model=AuthResponse)

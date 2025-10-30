@@ -32,12 +32,7 @@ export default function GenerateBattlecardForm({ onCreated, open, setOpen }) {
     const newCard = await createBattlecard({
       title,
       user_comp_id: parseInt(userCompId),
-      content: {
-        strengths: "Faster than competitors",
-        weaknesses: "Higher cost",
-        opportunities: "Expanding into EU market",
-        threats: "New entrants with lower pricing",
-      },
+      query: query || "",
       auto_release: false,
     });
     onCreated(newCard);
