@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { api } from "../../../lib/api";
+// import { api } from "../../../lib/api";
+import { fetchCompetitors, createCompetitor, updateCompetitor, deleteCompetitor } from "../../actions//competitors";
 
 
 export default function CompetitorsPage() {
@@ -27,7 +28,7 @@ export default function CompetitorsPage() {
 
   const loadData = async () => {
     try {
-      const data = await api("/competitors/");
+      const data = await fetchCompetitors(); 
       setCompetitors(data);
     } catch (e) {
       console.error(e);
@@ -35,6 +36,7 @@ export default function CompetitorsPage() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     loadData();
@@ -64,16 +66,11 @@ export default function CompetitorsPage() {
     if (!validateForm()) return;
     try {
       if (isEditMode && currentEditId) {
-        await api(`/competitors/${currentEditId}`, {
-          method: "PUT",
-          body: JSON.stringify(formData),
-        });
+        await updateCompetitor(currentEditId, formData); 
       } else {
-        await api("/competitors/", {
-          method: "POST",
-          body: JSON.stringify(formData),
-        });
+        await createCompetitor(formData); 
       }
+
       setIsModalOpen(false);
       setIsEditMode(false);
       setFormData({
@@ -92,7 +89,7 @@ export default function CompetitorsPage() {
 
   const handleDelete = async (id) => {
     try {
-      await api(`/competitors/${id}`, { method: "DELETE" });
+      await deleteCompetitor(id);
       await loadData();
     } catch (e) {
       alert("Error: " + e.message);
@@ -302,7 +299,7 @@ export default function CompetitorsPage() {
                 className={`w-full border p-2 rounded mb-1 ${
                   errors.industry ? "border-red-500" : ""
                 }`}
-                value={formData.industry}
+                value={formData.industry || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, industry: e.target.value })
                 }

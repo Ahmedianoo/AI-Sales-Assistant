@@ -13,7 +13,7 @@ export default function Navbar() {
     { name: "AI Chat", path: "/home" },
     { name: "Reports", path: "/reports" },
     { name: "Battlecards", path: "/battlecards" },
-    { name: "Settings", path: "/settings" },
+    { name: "Competitors", path: "/competitors" },
     //{ name: "Profile", path: "/profile"},
     { name: "Profile", path: "/profile", isIcon: true },
   ];
@@ -22,7 +22,7 @@ export default function Navbar() {
     "/": "beige",
     "/reports": "beige",
     "/battlecards": "beige",
-    "/settings": "green",
+    "/competitors": "green",
     "/profile": "beige",
     "/login": "green",
     "/signup": "green",

@@ -7,7 +7,7 @@ from db import get_db
 from models.competitors import Competitor
 from models.user_competitor import UserCompetitor
 from models.users import User
-from middleware.isAuthenticated import get_current_user  # ✅ import your auth dependency
+from middleware.isAuthenticated import get_current_user 
 
 router = APIRouter(prefix="/competitors", tags=["competitors"])
 
@@ -31,7 +31,7 @@ class CompetitorOut(CompetitorIn):
 def create_competitor(
     payload: CompetitorIn,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),  # ✅ use the logged-in user
+    current_user: User = Depends(get_current_user),  
 ):
     exists = (
         db.query(Competitor)
@@ -53,7 +53,7 @@ def create_competitor(
 
     # link competitor to user
     uc = UserCompetitor(
-        user_id=current_user.user_id,  # ✅ use real logged-in user ID
+        user_id=current_user.user_id,  
         competitor_id=c.competitor_id,
         report_frequency=payload.report_frequency,
         battlecard_frequency=payload.battlecard_frequency,
@@ -67,12 +67,12 @@ def create_competitor(
 @router.get("/", response_model=List[CompetitorOut])
 def list_competitors(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),  # ✅ get user
+    current_user: User = Depends(get_current_user),  
 ):
     results = (
         db.query(Competitor, UserCompetitor)
         .join(UserCompetitor, Competitor.competitor_id == UserCompetitor.competitor_id)
-        .filter(UserCompetitor.user_id == current_user.user_id)  # ✅ filter by user
+        .filter(UserCompetitor.user_id == current_user.user_id)  
         .all()
     )
 
@@ -94,7 +94,7 @@ def update_competitor(
     competitor_id: int = Path(...),
     payload: CompetitorIn = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),  # ✅ get user
+    current_user: User = Depends(get_current_user),  
 ):
     # ensure competitor belongs to this user
     uc = (
@@ -134,7 +134,7 @@ def update_competitor(
 def delete_competitor(
     competitor_id: int = Path(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),  # ✅ get user
+    current_user: User = Depends(get_current_user),  
 ):
     uc = (
         db.query(UserCompetitor)
