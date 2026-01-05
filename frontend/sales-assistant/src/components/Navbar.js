@@ -22,7 +22,7 @@ export default function Navbar() {
     "/": "beige",
     "/reports": "beige",
     "/battlecards": "beige",
-    "/competitors": "green",
+    "/competitors": "beige",
     "/profile": "beige",
     "/login": "green",
     "/signup": "green",

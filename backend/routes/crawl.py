@@ -1,7 +1,6 @@
 from fastapi import APIRouter, BackgroundTasks
-from services.ingest import process_and_ingest
-from crawl4ai import AsyncWebCrawler
 from pydantic import BaseModel
+from services.crawler import crawl_competitor_url
 
 
 router = APIRouter(tags=["crawler"])
@@ -18,19 +17,9 @@ class CrawlResponse(BaseModel):
 
 
 @router.post("/crawl_competitor", response_model=CrawlResponse)
-async def crawl_competitor(req: CrawlRequest, background_tasks: BackgroundTasks = None):
-    
-
-    async with AsyncWebCrawler() as crawler:
-        results = await crawler.arun(req.url)  
-
-    scheduled = 0
-    for doc in results:   # results is iterable of CrawlResult
-        if doc.markdown:
-            background_tasks.add_task(process_and_ingest, req.competitor_id, doc.markdown)
-            scheduled += 1
-
-    return CrawlResponse(competitor_id=req.competitor_id, url=req.url, scheduled_docs=scheduled )   
+async def crawl_competitor(req: CrawlRequest, background_tasks: BackgroundTasks):
+    scheduled = await crawl_competitor_url(req.competitor_id, req.url, background_tasks)
+    return CrawlResponse(competitor_id=req.competitor_id, url=req.url, scheduled_docs=scheduled)
 
 
 

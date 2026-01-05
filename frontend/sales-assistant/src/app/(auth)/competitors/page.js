@@ -122,9 +122,9 @@ export default function CompetitorsPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="absolute top-4 left-4 text-xl font-bold text-gray-800">
+      {/* <div className="absolute top-4 left-4 text-xl font-bold text-gray-800">
         NTG_SalesAI
-      </div>
+      </div> */}
 
       <div className="p-6 max-w-6xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">My Competitors</h1>

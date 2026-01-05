@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Path
 from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from services.crawler import crawl_competitor_url
+from fastapi import BackgroundTasks
 
 from db import get_db
 from models.competitors import Competitor
@@ -28,40 +30,50 @@ class CompetitorOut(CompetitorIn):
 
 
 @router.post("/", response_model=CompetitorOut)
-def create_competitor(
+async def create_competitor(
     payload: CompetitorIn,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),  
+    current_user: User = Depends(get_current_user),
+    background_tasks: BackgroundTasks = None,  
 ):
-    exists = (
-        db.query(Competitor)
-        .filter(Competitor.website_url == str(payload.website_url))
+
+    competitor = (db.query(Competitor).filter(Competitor.website_url == str(payload.website_url)).first())
+
+    if not competitor:
+        competitor = Competitor(
+            name=payload.name,
+            website_url=str(payload.website_url),
+            industry=payload.industry,
+        )
+        db.add(competitor)
+        db.commit()
+        db.refresh(competitor)
+
+
+    user_comp = (
+        db.query(UserCompetitor)
+        .filter_by(user_id=current_user.user_id, competitor_id=competitor.competitor_id)
         .first()
     )
-    if exists:
-        raise HTTPException(status_code=400, detail="Website already exists")
 
-    # create main competitor
-    c = Competitor(
-        name=payload.name,
-        website_url=str(payload.website_url),
-        industry=payload.industry,
-    )
-    db.add(c)
-    db.commit()
-    db.refresh(c)
+    if not user_comp:
 
-    # link competitor to user
-    uc = UserCompetitor(
-        user_id=current_user.user_id,  
-        competitor_id=c.competitor_id,
-        report_frequency=payload.report_frequency,
-        battlecard_frequency=payload.battlecard_frequency,
-    )
-    db.add(uc)
-    db.commit()
+        user_comp = UserCompetitor(
+            user_id=current_user.user_id,
+            competitor_id=competitor.competitor_id,
+            report_frequency=payload.report_frequency,
+            battlecard_frequency=payload.battlecard_frequency,
+        )
+        db.add(user_comp)
+        db.commit()
 
-    return c
+
+    if background_tasks:
+        background_tasks.add_task(
+            crawl_competitor_url, competitor.competitor_id, competitor.website_url, background_tasks
+        )
+
+    return competitor
 
 
 @router.get("/", response_model=List[CompetitorOut])
