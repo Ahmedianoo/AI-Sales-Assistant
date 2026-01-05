@@ -4,12 +4,13 @@ from db import SessionLocal
 from typing import List 
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
+from .schemas import SearchResult
 
 
  
-class SearchResult(BaseModel):
-    hit: Dict[str, Any]
-    text: Optional[str]
+# class SearchResult(BaseModel):
+#     hit: Dict[str, Any]
+#     text: Optional[str]
 
 def search_documents(user_id: int, competitor_ids: List[int], query: str, top_k: int = 5) -> List[SearchResult]:
     
