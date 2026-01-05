@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import List, Optional, Any
-from langgraph_app.battlecards_graph.graphs import battlecard_graph
-from langgraph_app.battlecards_graph.state import BattlecardState
+from langGraph_app.battlecards_graph.graphs import battlecard_graph
+from langGraph_app.battlecards_graph.state import BattlecardState
 import datetime
 from models.battlecards import Battlecard
 from models.users import User

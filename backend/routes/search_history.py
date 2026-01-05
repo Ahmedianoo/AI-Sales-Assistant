@@ -8,8 +8,8 @@ from models.users import User
 from uuid import UUID
 from datetime import datetime, timezone
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
-from langgraph_app.ai_chat_graph.graphs import build_chatbot_graph
-from langgraph_app.ai_chat_graph.state import ChatbotState
+from langGraph_app.ai_chat_graph.graphs import build_chatbot_graph
+from langGraph_app.ai_chat_graph.state import ChatbotState
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 router = APIRouter(prefix="/search_history", tags=["search_history"])

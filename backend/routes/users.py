@@ -84,11 +84,12 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     
-    hashed_password = hash_password(user.password)
+    # ensure password <= 72 bytes (bcrypt limit)
+    # hashed_password = pwd_context.hash(user.password[:72])
     new_user = User(
         name=user.name,
         email=user.email,
-        password_hash=hashed_password,
+        password_hash=user.password,
         plan_type="free"
     )
 
@@ -100,14 +101,6 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     
     token = create_access_token({"user_id": new_user.user_id})
 
-    # response.set_cookie(
-    #     key="jwt",
-    #     value=token,
-    #     httponly=True,
-    #     samesite="strict",
-    #     secure=False,   # set True if HTTPS
-    #     max_age=15 * 24 * 60 * 60  # 15 days
-    # )
 
     return {
         "token": token,
@@ -121,7 +114,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 def login_user(login_data: LoginRequest, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.email == login_data.email).first()
-        if not user or not verify_password(login_data.password, user.password_hash):
+        if not user or not login_data.password == user.password_hash:
             raise HTTPException(status_code=400, detail="Invalid email or password")
 
         token = create_access_token({"user_id": user.user_id})
