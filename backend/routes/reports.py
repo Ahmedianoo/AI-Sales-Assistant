@@ -172,7 +172,7 @@ async def get_user_reports(
         .all()
     )
 
-    if not reports:
-        raise HTTPException(status_code=404, detail=f"No reports found for user_id={user.user_id}")
+    # if not reports:
+    #     raise HTTPException(status_code=404, detail=f"No reports found for user_id={user.user_id}")
 
     return reports

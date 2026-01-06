@@ -44,15 +44,6 @@ langchain-google-genai  # integration layer for Gemini API
 
 
 psycopg_pool
-
-
-
-langchain-google-genai
-
 beautifulsoup4
-
-langchain_tavily
-langchain_groq
-
 langchain-core 
 langchain-community

@@ -86,10 +86,11 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     
     # ensure password <= 72 bytes (bcrypt limit)
     # hashed_password = pwd_context.hash(user.password[:72])
+    hashed_password = hash_password(user.password)
     new_user = User(
         name=user.name,
         email=user.email,
-        password_hash=user.password,
+        password_hash=hashed_password,
         plan_type="free"
     )
 
@@ -114,7 +115,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 def login_user(login_data: LoginRequest, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.email == login_data.email).first()
-        if not user or not login_data.password == user.password_hash:
+        if not user or not verify_password(login_data.password, user.password_hash):
             raise HTTPException(status_code=400, detail="Invalid email or password")
 
         token = create_access_token({"user_id": user.user_id})

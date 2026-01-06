@@ -38,7 +38,15 @@
   border: 1px solid #ccc;
   width: 250px;
   font-size: 15px;
+  color: #000;            /* black text for select */
+  background-color: #fff;  /* white background */
 }
+
+.dropdown option {
+  color: #000;            /* black text for all options */
+  background-color: #fff;  /* white background for options */
+}
+
 
 .btn-generate {
   padding: 10px 20px;

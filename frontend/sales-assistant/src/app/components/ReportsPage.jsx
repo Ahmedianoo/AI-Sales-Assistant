@@ -48,11 +48,29 @@ export default function ReportsPage() {
 
   const formatReportText = (text) => {
     if (!text) return "";
-    return text
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\\n/g, "<br/>")
-      .replace(/\\"/g, '"');
+
+    // Escape HTML
+    let escaped = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    // Bold (**bold**)
+    escaped = escaped.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+    // Convert numbered lists
+    escaped = escaped.replace(/^(\d+)\.\s+(.*)$/gm, "<li>$2</li>");
+    // Wrap <li> elements in <ol>
+    if (escaped.includes("<li>")) {
+      escaped = `<ol>${escaped}</ol>`;
+    }
+
+    // Convert line breaks to <br/>
+    escaped = escaped.replace(/\n/g, "<br/>");
+
+    return escaped;
   };
+
 
   const handleGenerateReport = async () => {
     try {
@@ -109,21 +127,28 @@ export default function ReportsPage() {
           <select
             id="competitor-select"
             className="dropdown"
-            value={selectedCompetitor ? selectedCompetitor.user_comp_id : ""}
+            value={selectedCompetitor?.user_comp_id || ""}
             onChange={(e) => {
+              const val = parseInt(e.target.value); // convert to number
               const selected = competitors.find(
-                (comp) => comp.user_comp_id === Number(e.target.value)
+                (comp) => comp.user_comp_id === val
               );
               setSelectedCompetitor(selected || null);
             }}
           >
             <option value="">-- Choose Competitor --</option>
             {competitors.map((comp) => (
-              <option key={comp.user_comp_id} value={comp.user_comp_id}>
-                {comp.competitor_name}
+              <option
+                key={comp.user_comp_id}
+                value={comp.user_comp_id}
+              >
+                {comp.name ?? "Unnamed Competitor"} {/* fallback */}
               </option>
             ))}
           </select>
+
+
+
 
           <button
             className="btn-generate"

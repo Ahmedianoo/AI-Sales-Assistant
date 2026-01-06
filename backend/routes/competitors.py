@@ -76,7 +76,7 @@ async def create_competitor(
     return competitor
 
 
-@router.get("/", response_model=List[CompetitorOut])
+@router.get("/") #, response_model=List[CompetitorOut]
 def list_competitors(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),  
@@ -91,13 +91,15 @@ def list_competitors(
     competitors = []
     for c, uc in results:
         competitors.append({
+            "user_comp_id": uc.user_comp_id,          
             "competitor_id": c.competitor_id,
-            "name": c.name,
+            "name": c.name,                           
             "website_url": c.website_url,
             "industry": c.industry,
             "report_frequency": uc.report_frequency,
             "battlecard_frequency": uc.battlecard_frequency,
         })
+
     return competitors
 
 
@@ -179,34 +181,34 @@ def delete_competitor(
     return {"message": "Competitor deleted successfully"}
 
 
-@router.get("/")
-def get_user_competitors(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Get all competitors assigned to the logged-in user.
-    Requires Authorization: Bearer <token>
-    """
-    user_competitors = (
-        db.query(UserCompetitor)
-        .filter(UserCompetitor.user_id == current_user.user_id)
-        .all()
-    )
+# @router.get("/")
+# def get_user_competitors(
+#     db: Session = Depends(get_db),
+#     current_user: User = Depends(get_current_user)
+# ):
+#     """
+#     Get all competitors assigned to the logged-in user.
+#     Requires Authorization: Bearer <token>
+#     """
+#     user_competitors = (
+#         db.query(UserCompetitor)
+#         .filter(UserCompetitor.user_id == current_user.user_id)
+#         .all()
+#     )
 
-    if not user_competitors:
-        return []
+#     if not user_competitors:
+#         return []
 
 
-    return [
-        {
-            "user_comp_id": uc.user_comp_id,
-            "competitor_id": uc.competitor.competitor_id,
-            "competitor_name": uc.competitor.name,
-            "website_url": uc.competitor.website_url,
-            "industry": uc.competitor.industry,
-            "report_frequency": uc.report_frequency,
-            "battlecard_frequency": uc.battlecard_frequency,
-        }
-        for uc in user_competitors
-    ]
+#     return [
+#         {
+#             "user_comp_id": uc.user_comp_id,
+#             "competitor_id": uc.competitor.competitor_id,
+#             "competitor_name": uc.competitor.name,
+#             "website_url": uc.competitor.website_url,
+#             "industry": uc.competitor.industry,
+#             "report_frequency": uc.report_frequency,
+#             "battlecard_frequency": uc.battlecard_frequency,
+#         }
+#         for uc in user_competitors
+#     ]
