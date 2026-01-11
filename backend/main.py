@@ -1,14 +1,14 @@
 from fastapi import FastAPI
-from routes import battlecards, milvus, ingest_search, crawl
-from routes import users
-from routes import search_history, ai_chat
+from routes import battlecards, milvus, ingest_search, crawl, reports
+from routes import users, competitors
+from routes import search_history, ai_chat, profile
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 from APScheduler.scheduler import start_scheduler
 from db import ASYNC_DATABASE_URL, async_pool
-from langgraph_app.ai_chat_graph.graphs import build_chatbot_graph
-from langgraph_app.ai_chat_graph.state import ChatbotState
+from langGraph_app.ai_chat_graph.graphs import build_chatbot_graph
+from langGraph_app.ai_chat_graph.state import ChatbotState
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from contextlib import asynccontextmanager
 
@@ -55,7 +55,12 @@ app.include_router(search_history.router)
 app.include_router(milvus.router)
 app.include_router(ingest_search.router)
 app.include_router(crawl.router)
+app.include_router(reports.router)
+app.include_router(competitors.router)
+
 app.include_router(ai_chat.router)
+app.include_router(profile.router)
+app.include_router(competitors.router)
 
 @app.get("/")
 def root():

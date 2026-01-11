@@ -84,6 +84,8 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     
+    # ensure password <= 72 bytes (bcrypt limit)
+    # hashed_password = pwd_context.hash(user.password[:72])
     hashed_password = hash_password(user.password)
     new_user = User(
         name=user.name,
@@ -100,14 +102,6 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     
     token = create_access_token({"user_id": new_user.user_id})
 
-    # response.set_cookie(
-    #     key="jwt",
-    #     value=token,
-    #     httponly=True,
-    #     samesite="strict",
-    #     secure=False,   # set True if HTTPS
-    #     max_age=15 * 24 * 60 * 60  # 15 days
-    # )
 
     return {
         "token": token,

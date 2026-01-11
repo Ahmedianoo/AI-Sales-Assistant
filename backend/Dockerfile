@@ -16,7 +16,8 @@ RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/wh
     && pip install --no-cache-dir -r requirements.txt \
     && rm -rf /root/.cache/pip
 
-# Install Playwright browsers
+# Install Playwright
+RUN pip install --no-cache-dir playwright
 RUN playwright install --with-deps
 
 COPY . .

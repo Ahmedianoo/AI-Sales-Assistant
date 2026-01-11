@@ -43,7 +43,7 @@ langchain-google-genai  # integration layer for Gemini API
 
 
 
-
-
-
-
+psycopg_pool
+beautifulsoup4
+langchain-core 
+langchain-community
