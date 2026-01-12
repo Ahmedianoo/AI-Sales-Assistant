@@ -1,6 +1,6 @@
 import axios from "axios";
 
-let baseURL;
+// let baseURL;
 
 // // If running in the browser → use localhost (your backend exposed to host machine)
 // if (typeof window !== "undefined") {
