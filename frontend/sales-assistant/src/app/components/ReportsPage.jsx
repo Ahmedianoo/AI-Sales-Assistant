@@ -22,7 +22,7 @@ export default function ReportsPage() {
         }
 
         // Fetch competitors (includes both user_comp_id and competitor_id)
-        const compRes = await fetch("http://localhost:8000/competitors/", {
+        const compRes = await fetch("https://ahmedianoo-ai-sales-assistant-backend.hf.space/competitors/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!compRes.ok) throw new Error("Failed to fetch competitors");
@@ -30,7 +30,7 @@ export default function ReportsPage() {
         setCompetitors(compData);
 
         // Fetch reports
-        const repRes = await fetch("http://localhost:8000/reports/", {
+        const repRes = await fetch("https://ahmedianoo-ai-sales-assistant-backend.hf.space/reports/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!repRes.ok) throw new Error("Failed to fetch reports");
@@ -89,7 +89,7 @@ export default function ReportsPage() {
 
       console.log("Sending body:", body);
 
-      const response = await fetch("http://localhost:8000/reports/run", {
+      const response = await fetch("https://ahmedianoo-ai-sales-assistant-backend.hf.space/reports/run", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
