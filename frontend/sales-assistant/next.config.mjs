@@ -1,10 +1,12 @@
-import { join } from "path";
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-/** @type {import('next').NextConfig} */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const nextConfig = {
-  webpack(config) {
-    // Alias '@/' to point to the 'src' folder
-    config.resolve.alias['@'] = join(__dirname, 'src');
+  webpack: (config, { isServer }) => {
+    config.resolve.alias['@'] = path.resolve(__dirname, 'src');
     return config;
   },
 };
