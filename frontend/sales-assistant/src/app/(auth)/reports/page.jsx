@@ -1,4 +1,4 @@
-import ReportsPage from '@/app/components/reportsPage'
+import ReportsPage from '../../../app/components/ReportsPage'
 import React from 'react'
 
 
