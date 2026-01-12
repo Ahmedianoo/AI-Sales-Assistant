@@ -20,7 +20,7 @@ export default function SignupPage() {
     setMessage("");
 
     try {
-      const res = await axios.post("http://localhost:8000/users/signup", form);
+      const res = await axios.post("https://ahmedianoo-ai-sales-assistant-backend.hf.space/users/signup", form);
       localStorage.setItem("jwt", res.data.token);
       router.push("/home");
 
