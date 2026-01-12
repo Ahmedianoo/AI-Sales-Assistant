@@ -30,11 +30,11 @@ class ReportRequest(BaseModel):
 # @router.post("/", response_model=dict)
 # async def generate_report(
 #     request: ReportRequest,
-#     user: dict = Depends(get_current_user),   # ✅ get current user
+#     user: dict = Depends(get_current_user),   # get current user
 #     db: Session = Depends(get_db)
 # ):
 #     try:
-#         # ✅ Construct ReportState with user_id from authentication
+#         # Construct ReportState with user_id from authentication
 #         state: ReportState = {
 #             "user_id": user.user_id,   # inject logged-in user id
 #             "competitor_ids": request.competitor_ids,
@@ -91,13 +91,13 @@ class ReportRequest(BaseModel):
 #         "error": None,
 #     }
 
-#     # ✅ use retriever pipeline
+#     # use retriever pipeline
 #     state = retrieve_docs(state)
 
-#     # ✅ apply deduplication here too (safety net)
+#     # apply deduplication here too (safety net)
 #     docs = deduplicate_docs(state["retrieved_docs"])
 
-#     # ✅ generate report from deduped docs
+#     # generate report from deduped docs
 #     report = generate_report(docs, state["query"])
 
 #     return {
@@ -117,7 +117,7 @@ async def run_full_pipeline(
     db: Session = Depends(get_db)
 ):
     try:
-        # 1️⃣ Initialize state
+        # Initialize state
         state = {
             "user_id": user.user_id,
             "competitor_ids": [request.competitor_id],  # used for retrieval
@@ -127,7 +127,7 @@ async def run_full_pipeline(
             "error": None,
         }
 
-        # 2️⃣ Build and retrieve
+        # Build and retrieve
         state = build_query(state)
         state = retrieve_docs(state)
 
@@ -135,11 +135,11 @@ async def run_full_pipeline(
             state["generated_report"] = "⚠️ No relevant documents found"
             return JSONResponse(content={"state": state}, status_code=200)
 
-        # 3️⃣ Generate report
+        #  Generate report
         report_text = generate_report(state["retrieved_docs"], state["query"])
         state["generated_report"] = report_text
 
-        # 4️⃣ Save report under correct user_comp_id
+        # 4️Save report under correct user_comp_id
         new_report = Report(
             user_comp_id=request.user_comp_id,
             report_type="competitor_analysis",
