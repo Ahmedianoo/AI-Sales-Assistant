@@ -155,12 +155,12 @@ All services can be started locally using Docker Compose.
 
 ## Technologies Used
 
-- **Frontend:** React, Next.js  
+- **Frontend:** Next.js  
 - **Backend:** Python, FastAPI  
 - **AI & NLP:** LangGraph, LLM APIs, Sentence Transformers  
 - **Databases:** PostgreSQL (Supabase), Milvus (Zilliz)  
 - **Web Scraping:** Crawl4AI  
-- **Search:** Tavily (LangGraph tool)  
+- **Search:** Tavily 
 - **DevOps:** Docker, Docker Compose  
 - **Project Management:** Agile methodology, Wekan boards  
 
