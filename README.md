@@ -57,7 +57,7 @@ An interactive chatbot that allows users to query competitor data using natural 
 - Context-aware and structured AI responses
 
 _Chatbot interface_  
-`/images/chatbot.png`
+`images/chatbot.png`
 
 ---
 
@@ -86,7 +86,7 @@ Battlecards provide focused AI insights about a **single selected competitor**.
 - Users can add notes to each battlecard
 
 _Battlecard view_  
-`/images/battlecard_view.png`
+`images/battlecard_view.png`
 
 ---
 
