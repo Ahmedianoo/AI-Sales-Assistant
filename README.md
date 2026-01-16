@@ -86,7 +86,7 @@ Battlecards provide focused AI insights about a **single selected competitor**.
 - Users can add notes to each battlecard
 
 _Battlecard view_  
-![battlecards](images/battlecard_view.png)
+![battlecards](images/battlecards_page.png)
 
 ---
 
