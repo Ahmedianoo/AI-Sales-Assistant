@@ -61,7 +61,7 @@ _Chatbot interface_
 
 ---
 
-### Reports (Automated & On-Demand)
+### Reports 
 
 AI-generated reports that summarize and analyze competitor data.
 
@@ -77,29 +77,31 @@ _Reports interface_
 
 ---
 
-### Battlecards (On-Demand Competitor Insights)
+### Battlecards
 
-Battlecards provide focused AI insights about a **single selected competitor**.
+Battlecards provide focused AI insights about a competitors.
 
+- Scheduled Battlecards using APScheduler
+- On-demand Battlecards generation
 - User selects a competitor from their list
 - Optional custom query to focus analysis  
   (e.g. pricing, product features, risks)
 - Generates structured, actionable insights
 - Users can add notes to each battlecard
 
-_Battlecard page_  
+_Battlecards page_  
 ![battlecards](images/battlecards_page.png)
 
-_Battlecard generation_  
+_Battlecards generation_  
 ![battlecards](images/battlecard_generation.png)
 
-_Battlecard view_  
+_Battlecards view_  
 ![battlecards](images/battlecard_view.png)
 
-_Battlecard deletion_  
+_Battlecards deletion_  
 ![battlecards](images/battlecard_deletion.png)
 
-
+### Other application pages
 _Landing page_  
 ![chatbot](images/landing_page.png)
 
