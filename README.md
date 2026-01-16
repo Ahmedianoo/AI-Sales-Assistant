@@ -72,6 +72,8 @@ AI-generated reports that summarize and analyze competitor data.
   - Key insights extracted from scraped data
 - Reports are stored in PostgreSQL and visualized in the dashboard
 
+_Reports interface_  
+![battlecards](images/reports_page.png)
 
 ---
 
@@ -85,8 +87,34 @@ Battlecards provide focused AI insights about a **single selected competitor**.
 - Generates structured, actionable insights
 - Users can add notes to each battlecard
 
-_Battlecard view_  
+_Battlecard page_  
 ![battlecards](images/battlecards_page.png)
+
+_Battlecard generation_  
+![battlecards](images/battlecard_generation.png)
+
+_Battlecard view_  
+![battlecards](images/battlecard_view.png)
+
+_Battlecard deletion_  
+![battlecards](images/battlecard_deletion.png)
+
+
+_Landing page_  
+![chatbot](images/landing_page.png)
+
+_Sign in_  
+![chatbot](images/sign_in.png)
+
+_Sign up_  
+![chatbot](images/sign_up.png)
+
+_Profile page_  
+![chatbot](images/profile_page.png)
+
+_Competitors page_  
+![chatbot](images/competitors_page.png)
+
 
 ---
 
