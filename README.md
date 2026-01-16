@@ -119,7 +119,7 @@ All services can be started locally using Docker Compose.
 - Databases are connected remotely
 
 🔗 **Live Application:**  
-(Add deployed app link here)
+[(Add deployed app link here)](https://ai-sales-assistant-seven.vercel.app/)
 
 ---
 
